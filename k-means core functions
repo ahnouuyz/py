@@ -1,0 +1,48 @@
+
+
+def assign_points_to_clusters(raw_data_2D, centroids):
+    """
+    Assign each point in the grid to the nearest centroid (in a given set).
+    Returns a dictionary with centroids as keys and coordinate-value dictionaries as values (a dictionary of dictionaries!).
+    """
+    all_coords = np.array(tuple(np.ndindex(raw_data_2D.shape)))
+    diff = all_coords[:, None] - centroids[None, :]
+    sq_dists = np.einsum('ijk,ijk->ij', diff, diff) # i -> coordinates, j -> centroids, k -> dimensions (y, x)
+    
+    cluster_dct = dict((tuple(centroid), {}) for centroid in centroids)
+    for centroid, coord_value in zip(np.argmin(sq_dists, axis=1), np.ndenumerate(raw_data_2D)):
+        cluster_dct[tuple(centroids[centroid])][coord_value[0]] = coord_value[1]
+    
+    return cluster_dct
+
+def update_centroids(cluster_dct):
+    """
+    Calculate new positions of centroids based on assigned clusters.
+    Still using the weighted-average method.
+    Weighted-average method does not necessarily lead to highest score.
+    Will be good to have another method.
+    """
+    new_centroids = []
+    for cluster in cluster_dct.values():
+        coords, values = map(np.array, tuple(zip(*cluster.items())))
+        scaled_values = values / values.sum()
+        mean_coord = np.einsum('ij,i->j', coords, scaled_values).round()
+        new_centroids.append(tuple(mean_coord))
+    return np.array(new_centroids)
+
+def global_score(cluster_dct):
+    """
+    Calculate the score for a given configuration.
+    """
+    global_score = 0
+    for centroid, cluster in cluster_dct.items():
+        centroid_score = cluster[centroid] # Store centroid's score first
+        cluster_pts, values = tuple(zip(*filter(lambda t: t[0] != centroid, cluster.items()))) # Remove centroid
+        centroid, cluster_pts, values = map(np.array, (centroid, cluster_pts, values))
+        diff = centroid - cluster_pts
+        distances = np.sqrt(np.einsum('ij,ij->i', diff, diff))
+        distances += 1 # <-- For compatibility
+        scores = values / distances
+        global_score += scores.sum() + centroid_score - 2000000 # 1000
+    return global_score
+    
