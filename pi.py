@@ -18,13 +18,12 @@ def taylor(precision):
     return pie, n
 
 def wallis(precision):
-    n, series_sum, pie = 0, 1, 0
+    n, series_prod, pie = 0, 1, 0
     while abs(pie - pi) > precision:
-        n += 1
-        nn = n + n
-        series_sum *= nn * nn / (nn - 1) / (nn + 1)
-        pie = series_sum * 2
-    return pie, n
+        n += 2
+        series_prod *= n * n / (n - 1) / (n + 1)
+        pie = series_prod * 2
+    return pie, int(n / 2)
 
 def spigot(precision):
     n, series_sum, pie = 0, 0, 0
