@@ -49,6 +49,6 @@ print(taylor(0.2))
 print(wallis(0.2))
 print(spigot(0.1))
 lst = [taylor, wallis, basel, spigot]
-results = race(0.00001, lst)
+results = race(0.01, lst)
 print(results)
 print_results(results)
