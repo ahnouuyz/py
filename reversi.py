@@ -9,23 +9,28 @@ def new_board():
     return ll
 
 def print_board(board):
-    for r in range(len(board)):
-        board[r].insert(0, r + 1)
-    board.append(' ,a,b,c,d,e,f,g,h'.split(','))
-    hline = (9 * 2 + 1) * '-'
-
+    new_board = [[str(i + 1)] + board[i] for i in range(8)]
+    new_board.append(' ,a,b,c,d,e,f,g,h'.split(','))
+    hline = (9 * 2 - 1) * '-'
+    hline = '---|' + hline
+    
     def print_row(row):
         txt = ' '
         for i in range(len(row)):
+            if row[i] == 2:
+                row[i] = 'W'
+            elif row[i] == 1:
+                row[i] = 'B'
+            
             if i == 0:
                 txt += str(row[i]) + ' | '
             else:
                 txt += str(row[i]) + ' '
-        print(txt[:-2])
+        print(txt)
 
-    for r in range(len(board)):
-        print_row(board[r])
-        if r == len(board) - 2:
+    for r in range(len(new_board)):
+        print_row(new_board[r])
+        if r == len(new_board) - 2:
             print(hline)
 
 def score(board):
@@ -50,5 +55,5 @@ def next_state(board, player, pos):
 
 board = new_board()
 print_board(board)
+print()
 print(score(board))
-
