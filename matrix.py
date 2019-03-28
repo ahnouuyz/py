@@ -3,29 +3,30 @@ def print_matrix(matrix):
         Values in each column will be right-aligned.
         No borders or anything.
     """
-    # Convert all values in the matrix to string type.
-    # This is done so that we can use the len() function on each value.
-    matrix2 = [list(map(str, row)) for row in matrix]
-    
-    # Transpose the matrix.
-    # The rows in the transposed matrix correspond to the columns in the original matrix.
-    matrix_T = list(zip(*matrix2))
-    
-    # Find the maximum width required for each column.
-    cws = [max(map(len, col)) for col in matrix_T]
-    
-    # Now to actually print out the values.
-    # r is the index for the outer list, corresponding to row number.
-    # c is the index for the inner lists, corresponding to column number.
-    for r in range(len(matrix2)):
-        for c in range(len(matrix2[r])):
-            # Calculate how many spaces to add in front of the value to make it right-aligned.
-            pad = (cws[c] - len(matrix2[r][c])) * ' '
-            
-            # Print the values out, separated by a space ' '.
-            print(pad + matrix2[r][c], end=' ')
-        # Print a newline.
-        print()
+    if matrix != None:
+        # Convert all values in the matrix to string type.
+        # This is done so that we can use the len() function on each value.
+        matrix2 = [list(map(str, row)) for row in matrix]
+
+        # Transpose the matrix.
+        # The rows in the transposed matrix correspond to the columns in the original matrix.
+        matrix_T = list(zip(*matrix2))
+
+        # Find the maximum width required for each column.
+        cws = [max(map(len, col)) for col in matrix_T]
+
+        # Now to actually print out the values.
+        # r is the index for the outer list, corresponding to row number.
+        # c is the index for the inner lists, corresponding to column number.
+        for r in range(len(matrix2)):
+            for c in range(len(matrix2[r])):
+                # Calculate how many spaces to add in front of the value to make it right-aligned.
+                pad = (cws[c] - len(matrix2[r][c])) * ' '
+
+                # Print the values out, separated by a space ' '.
+                print(pad + matrix2[r][c], end=' ')
+            # Print a newline.
+            print()
 
 def matrix_multiply(left_matrix, right_matrix):
     # Perform conversions if the input format is not correct.
@@ -42,6 +43,13 @@ def matrix_multiply(left_matrix, right_matrix):
             If entered as [a, b, c], then convert to the above.
         """
         right_matrix = [[val] for val in right_matrix]
+    
+    if len(left_matrix[0]) != len(right_matrix):
+        print('Matrices have incompatible dimensions and cannot be multiplied: ')
+        print_matrix(left_matrix)
+        print()
+        print_matrix(right_matrix)
+        return None
     
     # Declare a new matrix, of the correct size to store the result.
     # Set all initial values to 0, then we can increment/reassign later.
@@ -72,4 +80,5 @@ B = [[1],
 print_matrix(matrix_multiply(A, B))
 print()
 print_matrix(matrix_multiply(B, A))
-print_matrix(matrix_multiply(B, [5]))
+print()
+print_matrix(matrix_multiply(A, [5, 5, 5]))
