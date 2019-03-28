@@ -31,23 +31,28 @@ def print_board(board):
             print(hline)
 
 def score(board):
-    s1, s2 = 0, 0
+    s = {1: 0, 2: 0}
     for row in board:
         for num in row:
-            if num == 1:
-                s1 += 1
-            elif num == 2:
-                s2 += 1
-    return s1, s2
+            if num in s:
+                s[num] += 1
+    return s[1], s[2]
 
 def enclosing(board, player, pos, direct):
     lst = []
-    i = 1
-    while pos[0] + direct[0] * i < len(board) + 1 and pos[1] + direct[1] * i < len(board) + 1:
-        lst.append(board[pos[0] - 1 + direct[0] * i][pos[1] - 1 + direct[1] * i])
-        i += 1
+    r = pos[0] + direct[0]
+    c = pos[1] + direct[1]
+    while r < len(board) + 1 and c < len(board) + 1:
+        lst.append(board[r - 1][c - 1])
+        r += direct[0]
+        c += direct[1]
+    print(player)
     print(lst)
-    
+    print(player != lst[0])
+    print(player in lst[1:])
+
+    return None
+
 
 def valid_moves(board, player):
     pass
@@ -61,3 +66,5 @@ print_board(board)
 print()
 print(score(board))
 enclosing(board, 1, (3, 4), (1, 0))
+enclosing(board, 1, (6, 3), (-1, 1))
+
