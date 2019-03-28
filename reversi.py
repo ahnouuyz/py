@@ -17,15 +17,12 @@ def print_board(board):
     def print_row(row):
         txt = ' '
         for i in range(len(row)):
-            if row[i] == 2:
-                row[i] = 'W'
-            elif row[i] == 1:
-                row[i] = 'B'
-            
             if i == 0:
                 txt += str(row[i]) + ' | '
-            else:
+            elif isinstance(row[i], str):
                 txt += str(row[i]) + ' '
+            else:
+                txt += str(('-BW')[row[i]]) + ' '
         print(txt)
 
     for r in range(len(new_board)):
@@ -44,7 +41,13 @@ def score(board):
     return s1, s2
 
 def enclosing(board, player, pos, direct):
-    pass
+    lst = []
+    i = 1
+    while pos[0] + direct[0] * i < len(board) + 1 and pos[1] + direct[1] * i < len(board) + 1:
+        lst.append(board[pos[0] - 1 + direct[0] * i][pos[1] - 1 + direct[1] * i])
+        i += 1
+    print(lst)
+    
 
 def valid_moves(board, player):
     pass
@@ -57,3 +60,4 @@ board = new_board()
 print_board(board)
 print()
 print(score(board))
+enclosing(board, 1, (3, 4), (1, 0))
