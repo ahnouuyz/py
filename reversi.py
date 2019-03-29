@@ -68,11 +68,11 @@ def valid_moves(board, player):
                     break
     return vmoves
 
-
-    pass
-
 def next_state(board, player, pos):
-    pass
+    r = pos[0]
+    c = pos[1]
+    board[r][c] = player
+    return board, (0, 2, 1)[player]
 
 
 board = new_board()
