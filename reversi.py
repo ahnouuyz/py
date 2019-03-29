@@ -42,19 +42,33 @@ def enclosing(board, player, pos, direct):
     lst = []
     r = pos[0] + direct[0]
     c = pos[1] + direct[1]
-    while r < len(board) + 1 and c < len(board) + 1:
+    while r < len(board) + 1 and c < len(board[0]) + 1:
+        if board[r - 1][c - 1] == 0:
+            break
         lst.append(board[r - 1][c - 1])
         r += direct[0]
         c += direct[1]
-    print(player)
-    print(lst)
-    print(player != lst[0])
-    print(player in lst[1:])
-
-    return None
-
+    if len(lst) > 1:
+        if lst[-1] == player and player not in lst[:-1]:
+            return True
+        else:
+            return False
+    else:
+        return False
 
 def valid_moves(board, player):
+    directs = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
+    vmoves = []
+    for r in range(len(board)):
+        for c in range(len(board[r])):
+            for direct in directs:
+                valid = enclosing(board, player, (r, c), direct)
+                if valid:
+                    vmoves.append((r, c))
+                    break
+    return vmoves
+
+
     pass
 
 def next_state(board, player, pos):
@@ -65,6 +79,8 @@ board = new_board()
 print_board(board)
 print()
 print(score(board))
-enclosing(board, 1, (3, 4), (1, 0))
-enclosing(board, 1, (6, 3), (-1, 1))
+print(enclosing(board, 1, (3, 4), (1, 0)))
+print(enclosing(board, 1, (6, 3), (-1, 1)))
+print(valid_moves(board, 1))
+print(valid_moves(board, 2))
 
