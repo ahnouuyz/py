@@ -7,11 +7,11 @@ class Tictactoe:
         sll = [list(map(str, row)) for row in self.state]
         cws = [max(map(len, col)) for col in zip(*sll)]
         hlst = [(cw + 2) * '-' + '|' for cw in cws]
-        hline = ''.join(hlst)[:-1]
+        hline = '  ' + ''.join(hlst)[:-1]
 
-        txt = '\n'
+        txt = '   1   2   3 \n'
         for i, row in enumerate(sll):
-            line = ' '
+            line = f'{i + 1}  '
             for cw, val in zip(cws, row):
                 pad = (cw - len(val)) * ' '
                 line += ' XO'[int(val)] + pad + ' | '
@@ -29,7 +29,7 @@ class Tictactoe:
     def input_postition(self):
         print(self.__repr__())
         print(f'Available positions: {self.show_positions()}')
-        raw_input = input('Select a position (row,col) ["q" to quit]: ')
+        raw_input = input('Input a row,col ("q" to quit): ')
         
         if len(raw_input) > 0:
             if raw_input.lower().startswith('q'):
@@ -86,11 +86,9 @@ class Tictactoe:
         if pos == 'quit':
             print('Game terminated.')
         elif winner:
-            print('Game over!')
-            print(f'Player {winner} won!')
+            print(f'Game over! Player {winner} won!')
         else:
-            print('Game over!')
-            print('It\'s a draw!')
+            print('Game over! It\'s a draw!')
     
     def run_1_player(self):
         pass
