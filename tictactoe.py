@@ -1,12 +1,13 @@
 class Tictactoe:
     def __init__(self):
-        initial_state = [[0 for _ in range(3)] for _ in range(3)]
-        self.state = initial_state
+        self.state = [[0 for _ in range(3)] for _ in range(3)]
+        self.positions = set((r, c) for r in range(3) for c in range(3))
     
     def __repr__(self):
         sll = [list(map(str, row)) for row in self.state]
         cws = [max(map(len, col)) for col in zip(*sll)]
-        hline = '---|---|---'
+        hlst = [(cw + 2) * '-' + '|' for cw in cws]
+        hline = ''.join(hlst)[:-1]
 
         txt = '\n'
         for i, row in enumerate(sll):
@@ -15,37 +16,40 @@ class Tictactoe:
                 pad = (cw - len(val)) * ' '
                 line += ' XO'[int(val)] + pad + ' | '
             line = line[:-2] + ' '
-            txt += line + '\n'
-            if i < 2:
-                txt += hline + '\n'
+            txt += line + '\n' + hline + '\n' if i < 2 else line + '\n'
         return txt
     
     def __str__(self):
         return self.__repr__()
     
-    def get_postition(self):
+    def show_positions(self):
+        add_ones = lambda a: tuple(map(lambda b: b + 1, a))
+        return sorted(list(map(add_ones, tuple(self.positions))))
+
+    def input_postition(self):
         print(self.__repr__())
-        raw_input = input('Please choose a position (row,col): ')
+        print(f'Available positions: {self.show_positions()}')
+        raw_input = input('Select a position (row,col) ["q" to quit]: ')
         
         if len(raw_input) > 0:
             if raw_input.lower().startswith('q'):
                 return 'quit'
             
-            delimiters = ',.;:| '
-            for delimiter in delimiters:
-                if delimiter in raw_input:
-                    break
-            else:
-                return False
-            
-            r, c = tuple(map(int, raw_input.strip().split(delimiter)))
-            r, c = r - 1, c - 1
-            if r in (0, 1, 2) and c in (0, 1, 2) and self.state[r][c] == 0:
-                return r, c
+            delimiters = ',;:-_/.*~| '
+            mask = [delimiter in raw_input for delimiter in delimiters]
+            if any(mask):
+                delimiter = delimiters[mask.index(True)]
+                lst = raw_input.strip().split(delimiter)[:2]
+                if all(x.isnumeric() for x in lst):
+                    r, c = tuple(map(int, lst))
+                    r, c = r - 1, c - 1
+                    if (r, c) in self.positions:
+                        return r, c
 
     def update_state(self, player, pos):
         r, c = pos
         self.state[r][c] = player
+        self.positions -= {pos}
     
     def check_win(self):
         rows = self.state
@@ -56,34 +60,40 @@ class Tictactoe:
         for trip in trips:
             if 0 in trip:
                 continue
-            elif 1 not in trip:
-                return 2
-            elif 2 not in trip:
+            elif all(val == 1 for val in trip):
                 return 1
-
+            elif all(val == 2 for val in trip):
+                return 2
 
     def run_2_players(self):
-        move = 1
-        while move < 10:
+        while len(self.positions) > 0:
+            move = 10 - len(self.positions)
             player = (2, 1)[move % 2]
-            print(f'Round {move}: It is Player {player}\'s turn:')
+            print(f'\nRound {move}: It is Player {player}\'s turn:')
 
-            pos = self.get_postition()
+            pos = self.input_postition()
             if pos == 'quit':
                 break
             elif pos:
                 self.update_state(player, pos)
                 winner = self.check_win()
                 if winner:
-                    print(f'Player {winner} won!')
                     break
-                move += 1
             else:
-                print('Invalid move! Please try again...')
+                print('\nInvalid move! Please try again...')
         
         print(self.__repr__())
-        print('GAME OVER!')
+        if pos == 'quit':
+            print('Game terminated.')
+        elif winner:
+            print('Game over!')
+            print(f'Player {winner} won!')
+        else:
+            print('Game over!')
+            print('It\'s a draw!')
+    
+    def run_1_player(self):
+        pass
 
-game1 = Tictactoe()
-game1.run_2_players()
-
+game = Tictactoe()
+game.run_2_players()
