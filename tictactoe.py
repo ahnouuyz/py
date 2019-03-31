@@ -47,6 +47,21 @@ class Tictactoe:
         r, c = pos
         self.state[r][c] = player
     
+    def check_win(self):
+        rows = self.state
+        cols = list(zip(*rows))
+        diag1 = [[rows[i][i] for i in range(3)]]
+        diag2 = [[rows[2 - i][i] for i in range(3)]]
+        trips = rows + cols + diag1 + diag2
+        for trip in trips:
+            if 0 in trip:
+                continue
+            elif 1 not in trip:
+                return 2
+            elif 2 not in trip:
+                return 1
+
+
     def run_2_players(self):
         move = 1
         while move < 10:
@@ -58,6 +73,10 @@ class Tictactoe:
                 break
             elif pos:
                 self.update_state(player, pos)
+                winner = self.check_win()
+                if winner:
+                    print(f'Player {winner} won!')
+                    break
                 move += 1
             else:
                 print('Invalid move! Please try again...')
@@ -67,3 +86,4 @@ class Tictactoe:
 
 game1 = Tictactoe()
 game1.run_2_players()
+
