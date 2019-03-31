@@ -69,10 +69,14 @@ def valid_moves(board, player):
     return vmoves
 
 def next_state(board, player, pos):
-    r = pos[0]
-    c = pos[1]
-    board[r][c] = player
-    return board, (0, 2, 1)[player]
+    if pos in valid_moves(board, player):
+        r = pos[0]
+        c = pos[1]
+        board[r][c] = player
+        return board, (0, 2, 1)[player]
+    else:
+        print('Invalid move.')
+        return False
 
 
 board = new_board()
@@ -83,4 +87,6 @@ print(enclosing(board, 1, (3, 4), (1, 0)))
 print(enclosing(board, 1, (6, 3), (-1, 1)))
 print(valid_moves(board, 1))
 print(valid_moves(board, 2))
+board2 = next_state(board, 1, (3, 4))
+print_board(board2[0])
 
