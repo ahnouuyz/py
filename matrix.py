@@ -41,6 +41,11 @@ class Matrix:
     
     def __rmul__(self, other):
         return self.__mul__(other)
+    
+    def __truediv__(self, other):
+        if isinstance(other, (int, float)):
+            truediv_all = lambda lst: list(map(lambda a: a / other, lst))
+            return Matrix(list(map(truediv_all, self.ll)))
 
     def __matmul__(self, right_matrix):
         lm = self.ll
@@ -57,6 +62,24 @@ class Matrix:
     
     T = property(transpose)
 
+    def get_determinant(self):
+        pass
+    
+    det = property(get_determinant)
+
+    def g_elimination(self):
+        pass
+    
+    def gj_elimination(self):
+        pass
+    
+    ref = property(g_elimination)
+    rref = property(gj_elimination)
+
+    def invert(self):
+        pass
+
+
 if __name__ == '__main__':
     A = [[1, 2],
          [3, 4],
@@ -70,5 +93,6 @@ if __name__ == '__main__':
     print(A)
     print(A.T)
     print(A.T.T)
+    print(A / 2)
     print(A.T @ B)
     print(B.T @ A)
