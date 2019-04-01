@@ -42,15 +42,12 @@ class Matrix:
     def __rmul__(self, other):
         return self.__mul__(other)
 
-    def __matmul__(self, rm):
+    def __matmul__(self, right_matrix):
         lm = self.ll
-        rm = rm.ll
-
-        rm_T = tuple(zip(*rm))
-        if len(lm[0]) == len(rm):
+        rm = list(zip(*right_matrix.ll))
+        if self.ncols == right_matrix.nrows:
             dot = lambda v1, v2: sum(map(lambda a, b: a * b, v1, v2))
-            result = [[dot(lm[r], rm_T[c]) for c in range(len(rm_T))] for r in range(len(lm))]
-            return Matrix(result)
+            return Matrix([[dot(lrow, rcol) for rcol in rm] for lrow in lm])
         else:
             print('Unable to multiply matrices: ncols(left) != nrows(right).')
             return None
@@ -58,8 +55,7 @@ class Matrix:
     def transpose(self):
         return Matrix(list(zip(*self.ll)))
     
-    def T(self):
-        return Matrix(list(zip(*self.ll)))
+    T = property(transpose)
 
 if __name__ == '__main__':
     A = [[1, 2],
@@ -72,9 +68,7 @@ if __name__ == '__main__':
     B = Matrix(B)
 
     print(A)
-    print(A * 2)
-    print(2 * A)
-    print(A.T())
-    print(B.T() @ A)
-    print(A @ A.T() @ A)
-    print(A @ A.T() @ A + 1)
+    print(A.T)
+    print(A.T.T)
+    print(A.T @ B)
+    print(B.T @ A)
