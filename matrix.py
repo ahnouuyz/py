@@ -20,6 +20,13 @@ class Matrix:
     def __str__(self):
         return self.__repr__()
     
+    def __add__(self, val):
+        if isinstance(val, (int, float)):
+            ll = self.ll
+            add_val = lambda a: a + val
+            add_vals = lambda lst: list(map(add_val, lst))
+            return Matrix(list(map(add_vals, ll)))
+
     def __matmul__(self, rm):
         lm = self.ll
         rm = rm.ll
@@ -36,24 +43,26 @@ class Matrix:
     def transpose(self):
         return Matrix(list(zip(*self.ll)))
 
-A = [[1, 2, 3, 10],
-     [4, 5, 6, 11],
-     [7, 8, 9, 12]]
+if __name__ == '__main__':
+    A = [[1, 2, 3, 10],
+         [4, 5, 6, 11],
+         [7, 8, 9, 12]]
 
-B = [[5], 
-     [5],
-     [2],
-     [1]]
+    B = [[5], 
+         [5],
+         [2],
+         [1]]
 
-A = Matrix(A)
-B = Matrix(B)
+    A = Matrix(A)
+    B = Matrix(B)
 
-print(A)
-print(A.transpose())
-print(B)
-print(B.transpose())
+    print(A)
+    print(A + 1)
+    print(A.transpose())
+    print(B)
+    print(B.transpose())
 
-C = Matrix(A @ B)
-print(C)
-D = Matrix(B @ B.transpose())
-print(D)
+    C = Matrix(A @ B)
+    print(C)
+    D = Matrix(B @ B.transpose())
+    print(D)
