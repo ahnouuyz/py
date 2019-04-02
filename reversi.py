@@ -1,5 +1,9 @@
 import copy
 
+board_positions = set((r, c) for c in range(8) for r in range(8))
+directions = set((v - 1, h - 1) for h in range(3) for v in range(3))
+directions -= {(0, 0)}
+
 def new_board():
     ll = [[0 for _ in range(8)] for _ in range(8)]
     ll[3][3] = 2
@@ -9,26 +13,19 @@ def new_board():
     return ll
 
 def print_board(board):
-    new_board = [[str(i + 1)] + board[i] for i in range(8)]
-    new_board.append(' ,a,b,c,d,e,f,g,h'.split(','))
-    hline = (9 * 2 - 1) * '-'
-    hline = '---|' + hline
-    
-    def print_row(row):
-        txt = ' '
-        for i in range(len(row)):
-            if i == 0:
-                txt += str(row[i]) + ' | '
-            elif isinstance(row[i], str):
-                txt += str(row[i]) + ' '
-            else:
-                txt += str(('-BW')[row[i]]) + ' '
-        print(txt)
+    sboard = [['-BW'[n] for n in row] for row in board]
+    sboard = [[str(i + 1)] + row for i, row in enumerate(sboard)]
+    sboard.append(' ,a,b,c,d,e,f,g,h'.split(','))
 
-    for r in range(len(new_board)):
-        print_row(new_board[r])
-        if r == len(new_board) - 2:
-            print(hline)
+    txt = '\n'
+    for i, row in enumerate(sboard):
+        line = ' '
+        for j, val in enumerate(row):
+            line += val + ' ' if j > 0 else val + ' | '
+        txt += line[:-1] + '\n'
+        if i == len(sboard) - 2:
+            txt += '---|' + len(line[:-4]) * '-' + '\n'
+    print(txt)
 
 def score(board):
     s = {1: 0, 2: 0}
@@ -39,15 +36,16 @@ def score(board):
     return s[1], s[2]
 
 def enclosing(board, player, pos, direct):
+    vsum = lambda v1, v2: tuple(map(lambda a, b: a + b, v1, v2))
+
     lst = []
-    r = pos[0] + direct[0]
-    c = pos[1] + direct[1]
-    while r < len(board) + 1 and c < len(board[0]) + 1:
+    r, c = vsum(pos, direct)
+    while (r, c) in board_positions:
         if board[r - 1][c - 1] == 0:
             break
         lst.append(board[r - 1][c - 1])
-        r += direct[0]
-        c += direct[1]
+        r, c = vsum((r, c), direct)
+
     if len(lst) > 1:
         if lst[-1] == player and player not in lst[:-1]:
             return True
@@ -57,7 +55,7 @@ def enclosing(board, player, pos, direct):
         return False
 
 def valid_moves(board, player):
-    directs = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
+    directs = tuple(directions)
     vmoves = []
     for r in range(len(board)):
         for c in range(len(board[r])):
@@ -70,8 +68,7 @@ def valid_moves(board, player):
 
 def next_state(board, player, pos):
     if pos in valid_moves(board, player):
-        r = pos[0]
-        c = pos[1]
+        r, c = pos
         board[r][c] = player
         return board, (0, 2, 1)[player]
     else:
