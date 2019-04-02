@@ -23,30 +23,40 @@ class Matrix:
     
     def __add__(self, other):
         if isinstance(other, (int, float)):
-            add_to_all = lambda lst: list(map(lambda a: a + other, lst))
-            return Matrix(list(map(add_to_all, self.ll)))
+            add_2D = lambda lst: list(map(lambda a: a + other, lst))
+            return Matrix(list(map(add_2D, self.ll)))
     
     def __radd__(self, other):
         return self.__add__(other)
 
     def __sub__(self, other):
         if isinstance(other, (int, float)):
-            sub_from_all = lambda lst: list(map(lambda a: a - other, lst))
-            return Matrix(list(map(sub_from_all, self.ll)))
+            sub_2D = lambda lst: list(map(lambda a: a - other, lst))
+            return Matrix(list(map(sub_2D, self.ll)))
+    
+    def __rsub__(self, other):
+        if isinstance(other, (int, float)):
+            rsub_2D = lambda lst: list(map(lambda a: other - a, lst))
+            return Matrix(list(map(rsub_2D, self.ll)))
     
     def __mul__(self, other):
         if isinstance(other, (int, float)):
-            mul_to_all = lambda lst: list(map(lambda a: a * other, lst))
-            return Matrix(list(map(mul_to_all, self.ll)))
+            mul_2D = lambda lst: list(map(lambda a: a * other, lst))
+            return Matrix(list(map(mul_2D, self.ll)))
     
     def __rmul__(self, other):
         return self.__mul__(other)
     
     def __truediv__(self, other):
         if isinstance(other, (int, float)):
-            truediv_all = lambda lst: list(map(lambda a: a / other, lst))
-            return Matrix(list(map(truediv_all, self.ll)))
-
+            truediv_2D = lambda lst: list(map(lambda a: a / other, lst))
+            return Matrix(list(map(truediv_2D, self.ll)))
+    
+    def __rtruediv__(self, other):
+        if isinstance(other, (int, float)):
+            rtruediv_2D = lambda lst: list(map(lambda a: other / a, lst))
+            return Matrix(list(map(rtruediv_2D, self.ll)))
+    
     def __matmul__(self, right_matrix):
         lm = self.ll
         rm = list(zip(*right_matrix.ll))
@@ -67,11 +77,11 @@ class Matrix:
         ci = llt[0].index(min(llt[0]))
         ll[0], ll[ci] = ll[ci], ll[0]
 
+    ref = property(g_elimination)
     
     def gj_elimination(self):
         pass
     
-    ref = property(g_elimination)
     rref = property(gj_elimination)
 
     def get_determinant(self):
