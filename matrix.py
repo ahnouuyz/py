@@ -62,19 +62,30 @@ class Matrix:
     
     T = property(transpose)
 
-    def get_determinant(self):
-        pass
-    
-    det = property(get_determinant)
-
     def g_elimination(self):
-        pass
+        llt = list(zip(*self.ll))
+        ci = llt[0].index(min(llt[0]))
+        ll[0], ll[ci] = ll[ci], ll[0]
+
     
     def gj_elimination(self):
         pass
     
     ref = property(g_elimination)
     rref = property(gj_elimination)
+
+    def get_determinant(self):
+        if self.nrows == self.ncols:
+            ref = self.ref
+            prod = 1
+            for i in range(self.nrows):
+                prod *= ref[i][i]
+            return prod
+        else:
+            print('Matrix is not square.')
+            return None
+    
+    det = property(get_determinant)
 
     def invert(self):
         pass
@@ -93,6 +104,9 @@ if __name__ == '__main__':
     print(A)
     print(A.T)
     print(A.T.T)
+    print(A.T @ A)
+#    print((A.T @ A).det)
     print(A / 2)
     print(A.T @ B)
     print(B.T @ A)
+    print(B.T @ B)
