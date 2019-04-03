@@ -29,12 +29,10 @@ def print_board(board):
     print(txt)
 
 def score(board):
-    s = {1: 0, 2: 0}
-    for row in board:
-        for num in row:
-            if num in s:
-                s[num] += 1
-    return s[1], s[2]
+    """ Have to exclude count of 0 later.
+    """
+    s = [[1 for row in board for n in row if n == i] for i in (0, 1, 2)]
+    return tuple(map(sum, s))
 
 def enclosing(board, player, pos, direct):
     lst = []
@@ -69,7 +67,8 @@ def valid_moves(board, player):
     return vmoves
 
 def next_state(board, player, pos):
-    tpos = vsum(pos, (-1, -1))
+#    tpos = vsum(pos, (-1, -1))
+    tpos = pos
     print(tpos, valid_moves(board, player))
     if tpos in valid_moves(board, player):
         r, c = tpos
@@ -80,6 +79,10 @@ def next_state(board, player, pos):
         return False
 
 def position(string):
+    if isinstance(string, str):
+        r = '12345678'.index(string[1])
+        c = 'abcdefgh'.index(string[0])
+        return r, c
     pass
 
 def run_two_players():
@@ -88,19 +91,28 @@ def run_two_players():
 def run_single_player():
     pass
 
+def empty_spaces(board):
+    lst = [1 for row in board for num in row if num == 0]
+    return sum(lst)
+
 
 if __name__ == '__main__':
     game1 = new_board()
     print('score(game1):', score(game1))
     print('enclosing(game1, 1, (4, 5), (0, -1)):', enclosing(game1, 1, (4, 5), (0, -1)))
     print('enclosing(game1, 1, (4, 5), (1, 1)):', enclosing(game1, 1, (4, 5), (1, 1)))
-    move1 = next_state(game1, 1, (5, 6))
+    move1 = next_state(game1, 1, (4, 5))
     print('next_state(game1, 1, (4, 5)):')
     # print(move1)
     print_board(move1[0])
     print('valid_moves(move1[0], 2):')
     print(valid_moves(move1[0], 2))
     print_board(move1[0])
+
+    print(empty_spaces(game1))
+    # r = '12345678'.index('4')
+    # c = 'abcdefgh'.index('e')
+    # print(r, c)
 
     # print_board(board)
     # print()
