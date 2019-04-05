@@ -1,17 +1,13 @@
 import copy
 
 vsum = lambda v1, v2: tuple(map(lambda a, b: a + b, v1, v2))
-board_positions = set((r, c) for c in range(8) for r in range(8))
-positions_left = copy.deepcopy(board_positions)
-directions = set((v - 1, h - 1) for h in range(3) for v in range(3))
-directions -= {(0, 0)}
+all_pos = set((r, c) for c in range(8) for r in range(8))
+pos_left = copy.deepcopy(all_pos)
+all_dirs = set((v - 1, h - 1) for h in range(3) for v in range(3))
+all_dirs -= {(0, 0)}
 
-def update_positions_left(positions_left, pos):
-    positions_left -= set(pos)
-
-def empty_spaces(board):
-    lst = [1 for row in board for num in row if num == 0]
-    return sum(lst)
+def update_pos_left(pos_left, pos):
+    pos_left -= set(pos)
 
 
 def new_board():
@@ -20,7 +16,7 @@ def new_board():
     ll[3][4] = 1
     ll[4][3] = 1
     ll[4][4] = 2
-    update_positions_left(positions_left, [(3, 3), (3, 4), (4, 3), (4, 4)])
+    update_pos_left(pos_left, [(3, 3), (3, 4), (4, 3), (4, 4)])
     return ll
 
 def print_board(board):
@@ -48,9 +44,10 @@ def score(board):
 def enclosing(board, player, pos, direct):
     """ This can be optimized.
     """
+    other = (0, 2, 1)[player]
     lst = []
     r, c = vsum(pos, direct)
-    while (r, c) in board_positions:
+    while (r, c) in all_pos:
         if board[r][c] == 0:
             break
         lst.append(board[r][c])
@@ -63,7 +60,7 @@ def enclosing(board, player, pos, direct):
         # No need to check pos itself, because that's done elsewhere.
         if player in lst[1:]:
             k = lst[1:].index(player) + 1
-            if all(val == (0, 2, 1)[player] for val in lst[:k]):
+            if all(val == other for val in lst[:k]):
                 return True
             else:
                 return False
@@ -73,28 +70,24 @@ def enclosing(board, player, pos, direct):
         return False
 
 def valid_moves(board, player):
-    directs = directions
-    vmoves = []
-    for pos in positions_left:
-        for direct in directs:
-            valid = enclosing(board, player, pos, direct)
-            if valid:
-                vmoves.append(pos)
-                break
-    
+    ps = pos_left
+    ds = all_dirs
+    e = enclosing
+    vmoves = [p for p in ps for d in ds if e(board, player, p, d)]
+
     # Just to help visualize how this works. Remove later.
+    print('Valid moves:', vmoves)
     for pos in vmoves:
         r, c = pos
         board[r][c] = player + 2
     
-    print(vmoves)
     return vmoves
 
 def next_state(board, player, pos):
     if pos in valid_moves(board, player):
         r, c = pos
         board[r][c] = player
-        update_positions_left(positions_left, [pos])
+        update_pos_left(pos_left, [pos])
         return board, (0, 2, 1)[player]
     else:
         print('Invalid move.')
@@ -106,6 +99,8 @@ def position(string):
             r = '12345678'.index(string[1])
             c = 'abcdefgh'.index(string[0])
             return r, c
+        else:
+            print('Invalid input.')
 
 def run_two_players():
     pass
@@ -115,6 +110,7 @@ def run_single_player():
 
 
 if __name__ == '__main__':
+    # Tests.
     game1 = new_board()
     print('score(game1):', score(game1))
     print('enclosing(game1, 1, (4, 5), (0, -1)):', enclosing(game1, 1, (4, 5), (0, -1)))
@@ -131,6 +127,5 @@ if __name__ == '__main__':
     print(position('a0'))
     print(position('Genghis Khan'))
 
-#    print(empty_spaces(game1))
-    print(sorted(positions_left), len(positions_left))
+    print(sorted(pos_left), len(pos_left))
 

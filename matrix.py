@@ -120,3 +120,6 @@ if __name__ == '__main__':
     print(A.T @ B)
     print(B.T @ A)
     print(B.T @ B)
+
+    bigA = Matrix([[i for i in range(100)] for i in range(100)])
+    bigB = bigA @ bigA
