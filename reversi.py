@@ -1,18 +1,15 @@
 import copy
 
 def set_remove(set_, pos):
-    """ Remove pos from pos_left.
-        We can completely avoid this function if we used classes.
-        In fact, try to find a way to get rid of this function.
-    """
     set_ -= set(pos)
 
 def set_add(set_, pos):
     set_.update(set(pos))
 
-
 def new_board():
-    ll = [[0 for _ in range(8)] for _ in range(8)]
+    """ Returns a board with the Reversi starting configuration.
+    """
+    ll = [[0 for c in range(8)] for r in range(8)]
     ll[3][3] = 2
     ll[3][4] = 1
     ll[4][3] = 1
@@ -21,96 +18,92 @@ def new_board():
     return ll
 
 def print_board(board):
-    # Append row number (in string format) to the start of each row.
-    # Concurrently, convert numbers in each row to symbols.
-    # The small letters are there to visualize valid positions (remove when before final version).
-    # Every entry in sboard would be strings at the end.
-    sboard = [[str(i + 1)] + ['-BWbw'[n] for n in row] for i, row in enumerate(board)]
-    sboard.append(' ,a,b,c,d,e,f,g,h'.split(','))
-
-    # Store entire printout in render, then print all at once, instead of line-by-line.
-    # Prepare for transition into classes in the future.
-    render = '\n'
-    for i, row in enumerate(sboard):
-        line = ' '
-        for j, val in enumerate(row):
-            # Only add a stroke after the first column (with the row numbers).
-            line += val + ' ' if j > 0 else val + ' | '
-        render += line[:-1] + '\n'
-        # Only add a hohrizontal line before the last row (with the column markers).
-        if i == len(sboard) - 2:
-            render += '---|' + len(line[:-4]) * '-' + '\n'
-    print(render)
+    """ Prints the given board in human-readable form to the console.
+    """
+    # Change '-BWbw' to '-BW', or ' BW', or '_BW', etc.
+    f1 = lambda num: '-BWbw'[num]
+    f2 = lambda i, row: [str(i + 1), '|'] + list(map(f1, row)) + []
+    sboard = list(map(f2, range(len(board)), board))
+    sboard.append('-,|,-,-,-,-,-,-,-,-,'.split(','))
+    sboard.append(' ,|,a,b,c,d,e,f,g,h,'.split(','))
+    render = '\n'.join([' -'[row[0] == '-'].join(row) for row in sboard])
+    print('\n' + render + '\n')
 
 def score(board):
-    """ Have to exclude count of 0 later.
-        Dictionary conprehension would be even better!
+    """ Returns a pair of integers (s1, s2) where 
+        s1 is the number of stones of Player 1 on the board and 
+        s2 is the number of stones of Player 2.
     """
-    s = [[1 for row in board for n in row if n == i] for i in (0, 1, 2)]
-    return tuple(map(sum, s))
+    return tuple(sum([n == p for row in board for n in row]) for p in (1, 2))
 
-def enclosing(board, player, pos, direct):
-    """ This is probably the most important function.
-        This can be optimized.
-        I think.
+def enclosing(board, player, pos, dir_):
+    """ Represents whether putting a player's stone on a given position would 
+        enclose a straight line of opponent's stones in a given direction.
     """
-    other = (0, 2, 1)[player]
-    lst = []
-    r, c = vsum(pos, direct)
-    while (r, c) in all_pos:
-        if board[r][c] == 0:
-            break
-        lst.append(board[r][c])
-        r, c = vsum((r, c), direct)
+    line = get_line(board, player, pos, dir_)
 
-    # This is so ugly...
-    if lst:
-        # Cannot have player's piece immediately ahead.
-        # So check the one after and beyond.
-        # For now, the check on the first item will happen later.
-        # Flaw: pos itself is not checked in this function, but it's ok due to pos_left.
-        if player in lst[1:]:
-            k = lst[1:].index(player) + 1
-            if all(val == other for val in lst[:k]):
-                return True
-            else:
-                return False
+    # Player must have a stone down the line, beyond the adjacent position.
+    if player in line[2:]:
+        # Find the position of the nearest stone.
+        k = line[2:].index(player) + 2
+        opponent = (0, 2, 1)[player]
+        # All positions between must have opponent's stones.
+        if all(val == opponent for val in line[1:k]):
+            return True
         else:
             return False
     else:
         return False
 
+def get_line(board, player, pos, dir_):
+    vsum = lambda v1, v2: tuple(map(lambda a, b: a + b, v1, v2))
+    line = []
+    while pos in all_pos:
+        r, c = pos
+        line.append(board[r][c])
+        pos = vsum(pos, dir_)
+    return line
+
 def valid_moves(board, player):
-    # We should really, really, really do classes.
+    """ Returns all valid positions that player is allowed to drop a stone on.
+    """
     ps = pos_left
     ds = all_dirs
     e = enclosing
     vmoves = [p for p in ps for d in ds if e(board, player, p, d)]
 
-    # Just to help visualize valid positions (remove before final version).
-    for pos in vmoves:
-        r, c = pos
-        board[r][c] = player + 2
-    
+    map_valid_moves(board, player, vmoves)
     return vmoves
 
+def map_valid_moves(board, player, vmoves):
+    """ Help visualize valid positions for player.
+    """
+    for r, c in vmoves:
+        board[r][c] = player + 2
+
 def next_state(board, player, pos):
+    """ A pair (next_board, next_player) such that 
+        next_board is the result from placing player's stone on pos and 
+        next_player is the player who moves next, or 0 if the game ends.
+    """
     if pos in valid_moves(board, player):
         r, c = pos
         board[r][c] = player
         # Will need to flip the other player's pieces.
 
         set_remove(pos_left, [pos])
+
+        if len(pos_left) <= 0:
+            player = 0
+
         return board, (0, 2, 1)[player]
     else:
         print('Invalid move.')
         return False
 
 def position(string):
-    """ Reads only the 1st 2 characters of the input string.
-        1st character must be in a-h.
-        2nd character must be in 1-8.
-        The correct row and column indices will be obtained from the respective arrays.
+    """ Returns the board position (r, c) described by the string or 
+        None if the string does not correspond to a valid board position.
     """
     if string[0] in 'abcdefgh' and string[1] in '12345678':
         r = '12345678'.index(string[1])
@@ -127,46 +120,68 @@ def run_single_player():
 
 
 def tests():
-    test_list = [
-        'score(new_board())',
-        'enclosing(new_board(), 1, (4, 5), (0, -1))',
-        'enclosing(new_board(), 1, (4, 5), (1, 1))',
-        'next_state(new_board(), 1, (4, 5))',
-        'valid_moves(next_state(new_board(), 1, (4, 5))[0], 2)',
-        'position("e3")',
-        'position("l1")',
-        'position("a0")',
-        'position("Genghis Khan")'
-    ]
-    
-    expected = [
-        ''
-    ]
-    
-    print()
-    print('-' * 30, 'Tests:', '-' * 30)
-    for i, test in enumerate(test_list):
-        if i == 3:
-            print(i + 1, test, ':')
+    examples = {
+        'score(new_board())': '(2, 2)',
+        'enclosing(new_board(), 1, (4, 5), (0, -1))': 'True',
+        'enclosing(new_board(), 1, (4, 5), (1, 1))': 'False',
+        'next_state(new_board(), 1, (4, 5))': '',
+        'valid_moves(next_state(new_board(), 1, (4, 5))[0], 2)': '[(3, 5), (5, 3), (5, 5)]',
+        'position("e3")': '(2, 4)',
+        'position("l1")': 'None',
+        'position("a0")': 'None',
+        'position("Genghis Khan")': 'None'
+    }
+
+    print('\n' + '-' * 30, 'Tests:', '-' * 30)
+    for test, expect in examples.items():
+        if len(expect) == 0:
+            print(test, ':')
             print_board(next_state(new_board(), 1, (4, 5))[0])
             set_add(pos_left, [(4, 5)])
         else:
-            print(i + 1, test, ':', eval(test))
+            print(test, ':', expect, '<=?=>', eval(test))
 
 if __name__ == '__main__':
-    # Define a vector sum function to add tuples element-wise.
-    vsum = lambda v1, v2: tuple(map(lambda a, b: a + b, v1, v2))
-
     # Define a set of all valid directions.
-    all_dirs = set((v - 1, h - 1) for h in range(3) for v in range(3))
-    all_dirs -= {(0, 0)}
+    all_dirs = set((v, h) for h in (-1, 0, 1) for v in (-1, 0, 1)) - {(0, 0)}
 
     # Define a set of all valid board positions.
     all_pos = set((r, c) for c in range(8) for r in range(8))
 
     # Define a set of currently available positions.
+    # This seems like a good idea, but is causing a lot of headaches.
     pos_left = copy.deepcopy(all_pos)
 
     tests()
 
-#    print(sorted(pos_left), len(pos_left))
+# ============================================================================
+# Try converting to a class
+# ============================================================================
+
+# class Reversi:
+#     coords = set((r, c) for r in range(8) for c in range(8))
+#     dirs = set((r, c) for r in (-1, 0, 1) for c in (-1, 0, 1)) - {(0, 0)}
+
+#     def __init__(self):
+#         self.board = self.new_board()
+#         self.spaces = set((r, c) for c in range(8) for r in range(8))
+
+#     def new_board(self):
+#         ll = [[0 for _ in range(8)] for _ in range(8)]
+#         ll[3][3] = 2
+#         ll[3][4] = 1
+#         ll[4][3] = 1
+#         ll[4][4] = 2
+#         return ll
+    
+#     def print_board(self, board):
+#         f1 = lambda num: '-BWbw'[num]
+#         f2 = lambda i, row: [str(i + 1), '|'] + list(map(f1, row)) + []
+#         sboard = list(map(f2, range(len(board)), board))
+#         sboard.append('-,|,-,-,-,-,-,-,-,-,'.split(','))
+#         sboard.append(' ,|,a,b,c,d,e,f,g,h,'.split(','))
+#         render = '\n'.join([' -'[row[0] == '-'].join(row) for row in sboard])
+#         print('\n' + render + '\n')
+    
+#     def score(self, board):
+#         return tuple(sum([n == p for row in board for n in row]) for p in (1, 2))
