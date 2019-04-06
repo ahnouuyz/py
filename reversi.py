@@ -64,6 +64,17 @@ def get_line(board, player, pos, dir_):
         pos = vsum(pos, dir_)
     return line
 
+def switch_line(board, player, pos, dir_):
+    vsum = lambda v1, v2: tuple(map(lambda a, b: a + b, v1, v2))
+    opponent = (0, 2, 1)[player]
+    while pos in all_pos:
+        r, c = pos
+        if board[r][c] == player:
+            return None
+        elif board[r][c] == opponent:
+            board[r][c] = player
+        pos = vsum(pos, dir_)
+
 def valid_moves(board, player):
     """ Returns all valid positions that player is allowed to drop a stone on.
     """
@@ -88,15 +99,17 @@ def next_state(board, player, pos):
     """
     if pos in valid_moves(board, player):
         r, c = pos
+        for d in all_dirs:
+            switch_line(board, player, pos, d)
         board[r][c] = player
-        # Will need to flip the other player's pieces.
-
         set_remove(pos_left, [pos])
 
         if len(pos_left) <= 0:
             player = 0
 
-        return board, (0, 2, 1)[player]
+        next_board = copy.deepcopy(board)
+        next_player = (0, 2, 1)[player]
+        return next_board, next_player
     else:
         print('Invalid move.')
         return False
