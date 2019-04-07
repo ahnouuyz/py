@@ -167,34 +167,3 @@ if __name__ == '__main__':
 
     tests()
 
-# ============================================================================
-# Try converting to a class
-# ============================================================================
-
-# class Reversi:
-#     coords = set((r, c) for r in range(8) for c in range(8))
-#     dirs = set((r, c) for r in (-1, 0, 1) for c in (-1, 0, 1)) - {(0, 0)}
-
-#     def __init__(self):
-#         self.board = self.new_board()
-#         self.spaces = set((r, c) for c in range(8) for r in range(8))
-
-#     def new_board(self):
-#         ll = [[0 for _ in range(8)] for _ in range(8)]
-#         ll[3][3] = 2
-#         ll[3][4] = 1
-#         ll[4][3] = 1
-#         ll[4][4] = 2
-#         return ll
-    
-#     def print_board(self, board):
-#         f1 = lambda num: '-BWbw'[num]
-#         f2 = lambda i, row: [str(i + 1), '|'] + list(map(f1, row)) + []
-#         sboard = list(map(f2, range(len(board)), board))
-#         sboard.append('-,|,-,-,-,-,-,-,-,-,'.split(','))
-#         sboard.append(' ,|,a,b,c,d,e,f,g,h,'.split(','))
-#         render = '\n'.join([' -'[row[0] == '-'].join(row) for row in sboard])
-#         print('\n' + render + '\n')
-    
-#     def score(self, board):
-#         return tuple(sum([n == p for row in board for n in row]) for p in (1, 2))
