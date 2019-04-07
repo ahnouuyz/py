@@ -44,11 +44,17 @@ def print_results(results):
     for i, steps in results:
         print(f'Algorithm {i} finished in {steps} steps')
 
-print(basel(0.1))
-print(taylor(0.2))
-print(wallis(0.2))
-print(spigot(0.1))
-lst = [taylor, wallis, basel, spigot]
-results = race(0.01, lst)
-print(results)
-print_results(results)
+def test():
+    examples = ['basel(0.1)',
+                'taylor(0.2)',
+                'wallis(0.2)',
+                'spigot(0.1)',
+                'race(0.01, [taylor, wallis, basel])',
+                'print_results(race(0.01, [taylor, wallis, basel]))']
+
+    for example in examples:
+        print(example, ':', eval(example))
+
+if __name__ == '__main__':
+    test()
+    pass
