@@ -133,6 +133,9 @@ class Reversi:
         else:
             print('It\'s a draw!')
 
+    def best_move(self):
+        pass
+
     def run_single_player(self):
         """ UNDER CONNSTRUCTION!
         """
@@ -148,7 +151,7 @@ class Reversi:
             self.print_board()
             print(f'Valid positions: {self.human_valid_moves}')
 
-            if autoplay:
+            if self.player == 2:
                 pos = rd.sample(self.valid_moves, 1)[0]
             else:
                 pos = self.position(input('Enter a position: '))
@@ -170,7 +173,8 @@ class Reversi:
 
 def main():
     game = Reversi()
-    game.run_two_players(autoplay=True)
+#    game.run_two_players(autoplay=True)
+    game.run_single_player()
 
 if __name__ == '__main__':
     main()
