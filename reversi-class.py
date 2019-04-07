@@ -1,3 +1,5 @@
+import random as rd
+
 class Reversi:
     alldirs = set((r, c) for r in (-1, 0, 1) for c in (-1, 0, 1)) - {(0, 0)}
 
@@ -15,7 +17,6 @@ class Reversi:
         return (f'Current player: {self.player}\n'
                 f'Current opponent: {self.opponent}\n'
                 f'Current scores: {self.score}')
-#                f'Spaces left: {sorted(self.spaces)}')
 
     @property
     def score(self):
@@ -30,8 +31,13 @@ class Reversi:
         self.spaces.discard(pos)
 
     def print_board(self):
-        board2 = [[str(i), '|'] + ['-BW12'[n] for n in row] 
-                  for i, row in enumerate(self.board, start=1)]
+        ll = self.board
+        vmoves = self.valid_moves()
+        for r, c in vmoves:
+            ll[r][c] = 3
+
+        board2 = [[str(i), '|'] + ['.BW*'[n] for n in row] 
+                  for i, row in enumerate(ll, start=1)]
         board2.append('-,|,-,-,-,-,-,-,-,-,'.split(','))
         board2.append(' ,|,a,b,c,d,e,f,g,h,'.split(','))
         render = '\n'.join([' -'[row[0] == '-'].join(row) for row in board2])
@@ -75,12 +81,7 @@ class Reversi:
                   for pos in self.spaces 
                   for dir_ in Reversi.alldirs 
                   if self.enclosing(pos, dir_)]
-        self.map_valid_moves(vmoves)
         return vmoves
-
-    def map_valid_moves(self, vmoves):
-        for pos in vmoves:
-            self.dct[pos] = self.player + 2
 
     def next_state(self, pos):
         vmoves = self.valid_moves()
@@ -88,15 +89,9 @@ class Reversi:
             for dir_ in Reversi.alldirs:
                 self.flip_stones(vmoves, pos, dir_)
             self.update(pos, self.player)
-
-            if self.spaces:
-                self.player, self.opponent = self.opponent, self.player
-            else:
-                self.player, self.opponent = 0, 0
-            return self.board, self.player
+            self.player, self.opponent = self.opponent, self.player
         else:
-            print('Invalid move.')
-            return False
+            print('Invalid move, please try again.')
 
     def position(self, string):
         if string[0] in 'abcdefgh' and string[1] in '12345678':
@@ -104,16 +99,45 @@ class Reversi:
             c = 'abcdefgh'.index(string[0])
             return r, c
         else:
-            print('Invalid input.')
+            print('Invalid input, please try again.')
 
-    def run_two_players(self):
-        pass
+    def dpos(self, pos):
+        r, c = pos
+        return 'abcdefgh'[c] + '12345678'[r]
+
+    def run_two_players(self, autoplay=False):
+        while self.spaces:
+            round_ = 61 - len(self.spaces)
+            self.print_board()
+            vmoves = self.valid_moves()
+
+            if len(vmoves) <= 0:
+                print(f'Player {self.player} has no moves!')
+                break
+
+            print(f'It\'s round {round_} (of 60):')
+            print(f'It\'s Player {self.player}\'s turn.')
+
+            if autoplay:
+                pos = rd.sample(vmoves, 1)[0]
+            else:
+                pos = self.position(input('Enter a position: '))
+
+            if pos:
+                print(f'Player {self.player} chose: {self.dpos(pos)}')
+                self.next_state(pos)
+
+        self.print_board()
+        print('Game over!')
+        print(self.__repr__())
+        print(f'Player {max(self.score, key=self.score.get)} wins!')
 
     def run_single_player(self):
         pass
 
 def main():
-    pass
+    game = Reversi()
+    game.run_two_players(autoplay=True)
 
 def test():
     game = Reversi()
@@ -127,6 +151,6 @@ def test():
     print(game)
 
 if __name__ == '__main__':
-    test()
+#    test()
     main()
 
