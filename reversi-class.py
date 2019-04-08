@@ -59,18 +59,14 @@ class Reversi:
         render = '\n'.join([' -'[row[0] == '-'].join(row) for row in board2])
         print('\n' + render + '\n')
 
-    def get_line(self, pos, dir_):
+    def enclosing(self, pos, dir_):
         vsum = lambda v1, v2: tuple(map(lambda a, b: a + b, v1, v2))
         dct = {}
         while pos in self.dct.keys():
             dct[pos] = self.dct[pos]
             pos = vsum(pos, dir_)
-        return dct
 
-    def enclosing(self, pos, dir_):
-        dct = self.get_line(pos, dir_)
-        line = tuple(dct.values())
-        coords = tuple(dct.keys())
+        coords, line = tuple(zip(*dct.items()))
         if self.player in line[2:]:
             k = line[2:].index(self.player) + 2
             if all(val == self.opponent for val in line[1:k]):
@@ -94,6 +90,10 @@ class Reversi:
 
     def position(self, string):
         string = ''.join(string.strip().split()).lower()
+        if len(string) < 1:
+            print('Invalid input, please try again.')
+            return False
+
         if string[0] in 'abcdefgh' and string[1] in '12345678':
             r = '12345678'.index(string[1])
             c = 'abcdefgh'.index(string[0])
@@ -102,6 +102,9 @@ class Reversi:
             print('Invalid input, please try again.')
 
     def run_two_players(self, autoplay=False):
+        """ 
+            Add an option to quit.
+        """
         while self.spaces:
             round_ = 61 - len(self.spaces)
 
@@ -128,16 +131,36 @@ class Reversi:
         print('\nGame over!')
         self.print_board()
         print('Current scores:', self.score)
-        if max(self.score.values()) > 32:
-            print(f'Player {max(self.score, key=self.score.get)} wins!')
+        if self.score[1] > self.score[2]:
+            print('Player 1 wins!')
+        elif self.score[2] > self.score[1]:
+            print('Player 2 wins!')
         else:
             print('It\'s a draw!')
 
     def best_move(self):
-        pass
+        """ Loop through all valid moves, 
+            calculate change in score for all choices, 
+            return the choice that gives the highest score.
+        """
+        scores = {}
+        for pos in self.valid_moves:
+            score = 0
+            for dir_ in Reversi.dirs:
+                to_flip = self.enclosing(pos, dir_)
+                if to_flip:
+                    score += len(to_flip)
+            scores[pos] = score
+        print(scores)
+        best_score = max(scores.values())
+        best_move = max(scores, key=scores.get)
+        print('Best move:', best_move, ' | Best score:', best_score)
+        return best_move
 
-    def run_single_player(self):
-        """ UNDER CONNSTRUCTION!
+    def run_single_player(self, autoplay=False):
+        """ 
+            UNDER CONNSTRUCTION
+            Add a option to quit.
         """
         while self.spaces:
             round_ = 61 - len(self.spaces)
@@ -152,29 +175,44 @@ class Reversi:
             print(f'Valid positions: {self.human_valid_moves}')
 
             if self.player == 2:
-                pos = rd.sample(self.valid_moves, 1)[0]
+                pos = self.best_move()
             else:
-                pos = self.position(input('Enter a position: '))
+                if autoplay:
+                    pos = rd.sample(self.valid_moves, 1)[0]
+                else:
+                    pos = self.position(input('Enter a position: '))
 
             if pos:
                 print(f'Player {self.player} chose: {self.dpos(pos)}')
                 self.next_state(pos)
             print('-' * 60)
-            sleep(0.1)
+#            sleep(0.1)
 
         print('\nGame over!')
         self.print_board()
         print('Current scores:', self.score)
-        if max(self.score.values()) > 32:
-            print(f'Player {max(self.score, key=self.score.get)} wins!')
+        if self.score[1] > self.score[2]:
+            print('Player 1 wins!')
+            return 1
+        elif self.score[2] > self.score[1]:
+            print('Player 2 wins!')
+            return 2
         else:
             print('It\'s a draw!')
-        pass
+            return 0
+
+def player_2_win_rate(nrounds=10):
+    wins = 0
+    for i in range(nrounds):
+        if Reversi().run_single_player(autoplay=True) == 2:
+            wins += 1
+    print(f'Player 2 win rate: {wins / nrounds}')
 
 def main():
-    game = Reversi()
+#    game = Reversi()
 #    game.run_two_players(autoplay=True)
-    game.run_single_player()
+#    game.run_single_player(autoplay=True)
+    player_2_win_rate(nrounds=20)
 
 if __name__ == '__main__':
     main()
