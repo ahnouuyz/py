@@ -5,27 +5,19 @@ class Reversi:
     dirs = set((r, c) for r in (-1, 0, 1) for c in (-1, 0, 1)) - {(0, 0)}
 
     def __init__(self):
+        rs = '12345678'
+        cs = 'abcdefgh'
         self.dct = {(r, c): 0 for r in range(8) for c in range(8)}
-        self.spaces = set(self.dct.keys())
+        self.hpos = {(r, c): cs[c] + rs[r] for r, c in self.dct}
+        self.spaces = set(self.dct)
+        self.round = 1
+        self.player = 1
+        self.opponent = 2
+        self.score = {1: 0, 2: 0}
         self.update((3, 3), 2)
         self.update((3, 4), 1)
         self.update((4, 3), 1)
         self.update((4, 4), 2)
-        self.player = 1
-        self.opponent = 2
-
-    def __repr__(self):
-        return (f'Current player: {self.player}\n'
-                f'Current opponent: {self.opponent}\n'
-                f'Current scores: {self.score}')
-
-    @property
-    def score(self):
-        return {p: sum(n == p for n in self.dct.values()) for p in (1, 2)}
-
-    @property
-    def board(self):
-        return [[self.dct[(r, c)] for c in range(8)] for r in range(8)]
 
     @property
     def valid_moves(self):
@@ -34,39 +26,38 @@ class Reversi:
         encl = self.enclosing
         return set(pos for pos in poss for dir_ in dirs if encl(pos, dir_))
 
-    @property
-    def human_valid_moves(self):
-        vps = ['abcdefgh'[c] + '12345678'[r] for r, c in self.valid_moves]
-        return ' '.join(sorted(vps))
-
-    def dpos(self, pos):
-        r, c = pos
-        return 'abcdefgh'[c] + '12345678'[r]
-
     def update(self, pos, player):
+        if self.dct[pos] == self.opponent:
+            self.score[self.opponent] -= 1
         self.dct[pos] = player
+        self.score[player] += 1
         self.spaces.discard(pos)
 
     def print_board(self):
-        ll = self.board
+        ll = [[self.dct[(r, c)] for c in range(8)] for r in range(8)]
         for r, c in self.valid_moves:
             ll[r][c] = 3
 
-        board2 = [[str(i), '|'] + ['.BW*'[n] for n in row] 
+        sll = [[str(i), '|'] + ['.BW*'[n] for n in row] 
                   for i, row in enumerate(ll, start=1)]
-        board2.append('-,|,-,-,-,-,-,-,-,-,'.split(','))
-        board2.append(' ,|,a,b,c,d,e,f,g,h,'.split(','))
-        render = '\n'.join([' -'[row[0] == '-'].join(row) for row in board2])
+        sll.append('-,|,-,-,-,-,-,-,-,-,'.split(','))
+        sll.append(' ,|,a,b,c,d,e,f,g,h,'.split(','))
+        render = '\n'.join([' -'[row[0] == '-'].join(row) for row in sll])
         print('\n' + render + '\n')
 
     def enclosing(self, pos, dir_):
-        vsum = lambda v1, v2: tuple(map(lambda a, b: a + b, v1, v2))
         dct = {}
-        while pos in self.dct.keys():
+        while pos in self.dct:
             dct[pos] = self.dct[pos]
-            pos = vsum(pos, dir_)
+            pos = tuple(map(int.__add__, pos, dir_))
+
+        if len(dct) < 3:
+            return False
 
         coords, line = tuple(zip(*dct.items()))
+        if line[1] == self.player:
+            return False
+
         if self.player in line[2:]:
             k = line[2:].index(self.player) + 2
             if all(val == self.opponent for val in line[1:k]):
@@ -89,12 +80,8 @@ class Reversi:
             print('Invalid move, please try again.')
 
     def position(self, string):
-        string = ''.join(string.strip().split()).lower()
-        if len(string) < 1:
-            print('Invalid input, please try again.')
-            return False
-
-        if string[0] in 'abcdefgh' and string[1] in '12345678':
+        string = ''.join(string.split()).lower()
+        if string in self.hpos.values():
             r = '12345678'.index(string[1])
             c = 'abcdefgh'.index(string[0])
             return r, c
@@ -106,16 +93,15 @@ class Reversi:
             Add an option to quit.
         """
         while self.spaces:
-            round_ = 61 - len(self.spaces)
-
             if len(self.valid_moves) <= 0:
                 print(f'Player {self.player} has no moves!')
                 break
 
-            print(f'\nRound {round_} (of 60), Player {self.player}\'s turn:')
+            print(f'\nRound {self.round} (of 60), Player {self.player}\'s turn:')
             print('Current scores:', self.score)
             self.print_board()
-            print(f'Valid positions: {self.human_valid_moves}')
+            hvm = ' '.join(self.hpos[p] for p in self.valid_moves)
+            print(f'Valid positions: {hvm}')
 
             if autoplay:
                 pos = rd.sample(self.valid_moves, 1)[0]
@@ -123,20 +109,22 @@ class Reversi:
                 pos = self.position(input('Enter a position: '))
 
             if pos:
-                print(f'Player {self.player} chose: {self.dpos(pos)}')
+                print(f'Player {self.player} chose: {self.hpos[pos]}')
                 self.next_state(pos)
+            self.round += 1
             print('-' * 60)
             sleep(0.1)
 
         print('\nGame over!')
         self.print_board()
         print('Current scores:', self.score)
-        if self.score[1] > self.score[2]:
-            print('Player 1 wins!')
-        elif self.score[2] > self.score[1]:
-            print('Player 2 wins!')
+        if self.score[1] == self.score[2]:
+            print('It\'s s draw!')
+            return 0
         else:
-            print('It\'s a draw!')
+            winner = max(self.score, key=self.score.get)
+            print(f'Player {winner} wins!')
+            return winner
 
     def best_move(self):
         """ Loop through all valid moves, 
@@ -163,16 +151,15 @@ class Reversi:
             Add a option to quit.
         """
         while self.spaces:
-            round_ = 61 - len(self.spaces)
-
             if len(self.valid_moves) <= 0:
                 print(f'Player {self.player} has no moves!')
                 break
 
-            print(f'\nRound {round_} (of 60), Player {self.player}\'s turn:')
+            print(f'\nRound {self.round} (of 60), Player {self.player}\'s turn:')
             print('Current scores:', self.score)
             self.print_board()
-            print(f'Valid positions: {self.human_valid_moves}')
+            hvm = ' '.join(self.hpos[p] for p in self.valid_moves)
+            print(f'Valid positions: {hvm}')
 
             if self.player == 2:
                 pos = self.best_move()
@@ -183,23 +170,21 @@ class Reversi:
                     pos = self.position(input('Enter a position: '))
 
             if pos:
-                print(f'Player {self.player} chose: {self.dpos(pos)}')
+                print(f'Player {self.player} chose: {self.hpos[pos]}')
                 self.next_state(pos)
+            self.round += 1
             print('-' * 60)
-#            sleep(0.1)
 
         print('\nGame over!')
         self.print_board()
         print('Current scores:', self.score)
-        if self.score[1] > self.score[2]:
-            print('Player 1 wins!')
-            return 1
-        elif self.score[2] > self.score[1]:
-            print('Player 2 wins!')
-            return 2
-        else:
-            print('It\'s a draw!')
+        if self.score[1] == self.score[2]:
+            print('It\'s s draw!')
             return 0
+        else:
+            winner = max(self.score, key=self.score.get)
+            print(f'Player {winner} wins!')
+            return winner
 
 def player_2_win_rate(nrounds=10):
     wins = 0
@@ -209,10 +194,10 @@ def player_2_win_rate(nrounds=10):
     print(f'Player 2 win rate: {wins / nrounds}')
 
 def main():
-#    game = Reversi()
+    game = Reversi()
 #    game.run_two_players(autoplay=True)
-#    game.run_single_player(autoplay=True)
-    player_2_win_rate(nrounds=20)
+    game.run_single_player(autoplay=True)
+#    player_2_win_rate(nrounds=20)
 
 if __name__ == '__main__':
     main()
