@@ -45,6 +45,15 @@ class Reversi:
         render = '\n'.join([' -'[row[0] == '-'].join(row) for row in sll])
         print('\n' + render + '\n')
 
+    def cells_around(self, pos):
+        lst = []
+        for dir_ in Reversi.dirs:
+            lst.append(self.dct[tuple(map(int.__add__, pos, dir_))])
+        if any(x == self.opponent for x in lst):
+            return True
+        else:
+            return False
+
     def enclosing(self, pos, dir_):
         dct = {}
         while pos in self.dct:
