@@ -2,29 +2,23 @@ import random as rd
 from time import sleep
 
 class Reversi:
-    dirs = set((r, c) for r in (-1, 0, 1) for c in (-1, 0, 1)) - {(0, 0)}
-
     def __init__(self):
         rs = '12345678'
         cs = 'abcdefgh'
+        step = -1, 0, 1
         self.dct = {(r, c): 0 for r in range(8) for c in range(8)}
         self.hpos = {(r, c): cs[c] + rs[r] for r, c in self.dct}
+        self.dirs = {(y, x) for y in step for x in step} - {(0, 0)}
         self.spaces = set(self.dct)
         self.round = 1
         self.player = 1
         self.opponent = 2
         self.score = {1: 0, 2: 0}
+        self.valid_moves = set()
         self.update((3, 3), 2)
         self.update((3, 4), 1)
         self.update((4, 3), 1)
         self.update((4, 4), 2)
-
-    @property
-    def valid_moves(self):
-        poss = self.spaces
-        dirs = Reversi.dirs
-        encl = self.enclosing
-        return set(pos for pos in poss for dir_ in dirs if encl(pos, dir_))
 
     def update(self, pos, player):
         if self.dct[pos] == self.opponent:
@@ -32,27 +26,28 @@ class Reversi:
         self.dct[pos] = player
         self.score[player] += 1
         self.spaces.discard(pos)
+        self.valid_moves.discard(pos)
+
+    def get_valid_moves(self):
+        set_ = set()
+        for pos in self.spaces:
+            for dir_ in self.dirs:
+                if self.enclosing(pos, dir_):
+                    set_ |= {pos}
+                    break
+        return set_
 
     def print_board(self):
-        ll = [[self.dct[(r, c)] for c in range(8)] for r in range(8)]
-        for r, c in self.valid_moves:
-            ll[r][c] = 3
-
-        sll = [[str(i), '|'] + ['.BW*'[n] for n in row] 
-                  for i, row in enumerate(ll, start=1)]
+        sll = [[str(r + 1), '|'] 
+               + ['*' 
+                  if (r, c) in self.valid_moves 
+                  else '.BW'[self.dct[(r, c)]] 
+               for c in range(8)] 
+               for r in range(8)]
         sll.append('-,|,-,-,-,-,-,-,-,-,'.split(','))
         sll.append(' ,|,a,b,c,d,e,f,g,h,'.split(','))
         render = '\n'.join([' -'[row[0] == '-'].join(row) for row in sll])
         print('\n' + render + '\n')
-
-    def cells_around(self, pos):
-        lst = []
-        for dir_ in Reversi.dirs:
-            lst.append(self.dct[tuple(map(int.__add__, pos, dir_))])
-        if any(x == self.opponent for x in lst):
-            return True
-        else:
-            return False
 
     def enclosing(self, pos, dir_):
         dct = {}
@@ -64,25 +59,26 @@ class Reversi:
             return False
 
         coords, line = tuple(zip(*dct.items()))
-        if line[1] == self.player:
+        if 1 not in line or 2 not in line:
             return False
 
-        if self.player in line[2:]:
+        try:
             k = line[2:].index(self.player) + 2
             if all(val == self.opponent for val in line[1:k]):
                 return coords[1:k]
             else:
                 return False
-        else:
+        except ValueError:
             return False
 
     def next_state(self, pos):
         if pos in self.valid_moves:
-            for dir_ in Reversi.dirs:
-                to_flip = self.enclosing(pos, dir_)
-                if to_flip:
-                    for coord in to_flip:
+            for dir_ in self.dirs:
+                try:
+                    for coord in self.enclosing(pos, dir_):
                         self.update(coord, self.player)
+                except TypeError:
+                    pass
             self.update(pos, self.player)
             self.player, self.opponent = self.opponent, self.player
         else:
@@ -102,6 +98,7 @@ class Reversi:
             Add an option to quit.
         """
         while self.spaces:
+            self.valid_moves = self.get_valid_moves()
             if len(self.valid_moves) <= 0:
                 print(f'Player {self.player} has no moves!')
                 break
@@ -135,31 +132,31 @@ class Reversi:
             print(f'Player {winner} wins!')
             return winner
 
-    def best_move(self):
+    def local_best(self):
         """ Loop through all valid moves, 
             calculate change in score for all choices, 
             return the choice that gives the highest score.
         """
-        scores = {}
+        max_score = 0
         for pos in self.valid_moves:
             score = 0
-            for dir_ in Reversi.dirs:
-                to_flip = self.enclosing(pos, dir_)
-                if to_flip:
-                    score += len(to_flip)
-            scores[pos] = score
-        print(scores)
-        best_score = max(scores.values())
-        best_move = max(scores, key=scores.get)
-        print('Best move:', best_move, ' | Best score:', best_score)
-        return best_move
+            for dir_ in self.dirs:
+                try:
+                    score += len(self.enclosing(pos, dir_))
+                except TypeError:
+                    pass
+            if max_score < score:
+                max_score = score
+                max_pos = pos
+        return max_pos
 
     def run_single_player(self, autoplay=False):
         """ 
-            UNDER CONNSTRUCTION
+            UNDER CONSTRUCTION
             Add a option to quit.
         """
         while self.spaces:
+            self.valid_moves = self.get_valid_moves()
             if len(self.valid_moves) <= 0:
                 print(f'Player {self.player} has no moves!')
                 break
@@ -171,7 +168,7 @@ class Reversi:
             print(f'Valid positions: {hvm}')
 
             if self.player == 2:
-                pos = self.best_move()
+                pos = self.local_best()
             else:
                 if autoplay:
                     pos = rd.sample(self.valid_moves, 1)[0]
@@ -206,7 +203,7 @@ def main():
     game = Reversi()
 #    game.run_two_players(autoplay=True)
     game.run_single_player(autoplay=True)
-#    player_2_win_rate(nrounds=20)
+#    player_2_win_rate(nrounds=30)
 
 if __name__ == '__main__':
     main()
