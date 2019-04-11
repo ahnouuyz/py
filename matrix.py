@@ -1,125 +1,133 @@
 class Matrix:
     def __init__(self, ll):
-        self.ll = ll
-        self.nrows = len(ll)
-        self.ncols = len(ll[0])
-    
-    def __repr__(self):
-        sll = [list(map(str, row)) for row in self.ll]
-        cws = [max(map(len, col)) for col in zip(*sll)]
-        txt = ''
-        for i, row in enumerate(sll):
-            line = ' [' if i > 0 else '[['
-            for cw, val in zip(cws, row):
-                spaces = (cw - len(val)) * ' '
-                line += spaces + val + ' '
-            line = line[:-1]
-            line += ']' if i < len(sll) - 1 else ']]'
-            txt += line + '\n'
-        return txt[:-1]
-    
+        self.ll = [[float(val) for val in row] for row in ll]
+        self.shape = len(ll), len(ll[0])
+
     def __str__(self):
-        return self.__repr__()
-    
+        sll = [[str(val) for val in row] for row in self.ll]
+        cws = [max(map(len, col)) for col in zip(*sll)]
+        sll = [[(cw - len(val)) * ' ' + val 
+                for cw, val in zip(cws, row)] 
+                for row in sll]
+        render = [('[[', ' [')[i > 0] 
+                  + '  '.join(row) 
+                  + (']]', ']')[i < len(sll) - 1] 
+                  for i, row in enumerate(sll)]
+        return '\n'.join(render)
+
     def __add__(self, other):
         if isinstance(other, (int, float)):
-            add_2D = lambda lst: list(map(lambda a: a + other, lst))
-            return Matrix(list(map(add_2D, self.ll)))
-    
-    def __radd__(self, other):
-        return self.__add__(other)
+            return Matrix([[val + other for val in row] for row in self.ll])
 
     def __sub__(self, other):
         if isinstance(other, (int, float)):
-            sub_2D = lambda lst: list(map(lambda a: a - other, lst))
-            return Matrix(list(map(sub_2D, self.ll)))
-    
+            return Matrix([[val - other for val in row] for row in self.ll])
+
     def __rsub__(self, other):
         if isinstance(other, (int, float)):
-            rsub_2D = lambda lst: list(map(lambda a: other - a, lst))
-            return Matrix(list(map(rsub_2D, self.ll)))
-    
+            return Matrix([[other - val for val in row] for row in self.ll])
+
     def __mul__(self, other):
         if isinstance(other, (int, float)):
-            mul_2D = lambda lst: list(map(lambda a: a * other, lst))
-            return Matrix(list(map(mul_2D, self.ll)))
-    
-    def __rmul__(self, other):
-        return self.__mul__(other)
-    
+            return Matrix([[val * other for val in row] for row in self.ll])
+
     def __truediv__(self, other):
         if isinstance(other, (int, float)):
-            truediv_2D = lambda lst: list(map(lambda a: a / other, lst))
-            return Matrix(list(map(truediv_2D, self.ll)))
-    
+            return Matrix([[val / other for val in row] for row in self.ll])
+
     def __rtruediv__(self, other):
         if isinstance(other, (int, float)):
-            rtruediv_2D = lambda lst: list(map(lambda a: other / a, lst))
-            return Matrix(list(map(rtruediv_2D, self.ll)))
-    
-    def __matmul__(self, right_matrix):
-        lm = self.ll
-        rm = list(zip(*right_matrix.ll))
-        if self.ncols == right_matrix.nrows:
-            dot = lambda v1, v2: sum(map(lambda a, b: a * b, v1, v2))
-            return Matrix([[dot(lrow, rcol) for rcol in rm] for lrow in lm])
-        else:
-            print('Unable to multiply matrices: ncols(left) != nrows(right).')
+            return Matrix([[other / val for val in row] for row in self.ll])
+
+    def __matmul__(self, other):
+        if self.shape[1] != other.shape[0]:
+            print('Unable to multiply matrices.')
+            print(f'Left matrix: {self.shape[0]} x {self.shape[1]}')
+            print(f'Right matrix: {other.shape[0]} x {other.shape[1]}')
             return None
+        dot = lambda v1, v2: sum(map(float.__mul__, v1, v2))
+        lm = self.ll
+        rm = list(zip(*other.ll))
+        return Matrix([[dot(lr, rc) for rc in rm] for lr in lm])
 
     def transpose(self):
         return Matrix(list(zip(*self.ll)))
-    
-    T = property(transpose)
+
+    def flatten(self):
+        return [val for row in self.ll for val in row]
 
     def g_elimination(self):
-        llt = list(zip(*self.ll))
-        ci = llt[0].index(min(llt[0]))
-        ll[0], ll[ci] = ll[ci], ll[0]
+        raise NotImplementedError
 
-    ref = property(g_elimination)
-    
+        r, c = 0, 0
+        while r in range(self.shape[0]) and c in range(self.shape[1]):
+            # Find the row with the largest absolute leading number.
+
+            pass
+
+        ll = self.ll
+        pivot_row = self.ll.index(max(lambda x: abs(x[0])))
+
+        return None
+
     def gj_elimination(self):
-        pass
-    
-    rref = property(gj_elimination)
+        raise NotImplementedError
 
-    def get_determinant(self):
-        if self.nrows == self.ncols:
-            ref = self.ref
-            prod = 1
-            for i in range(self.nrows):
-                prod *= ref[i][i]
-            return prod
-        else:
-            print('Matrix is not square.')
-            return None
-    
-    det = property(get_determinant)
+    def determinant(self):
+        raise NotImplementedError
 
     def invert(self):
-        pass
+        raise NotImplementedError
 
+    @classmethod
+    def zeros(cls, n):
+        return Matrix([[0 for c in range(n)] for r in range(n)])
+
+    @classmethod
+    def ones(cls, n):
+        return Matrix([[1 for c in range(n)] for r in range(n)])
+
+    @classmethod
+    def eye(cls, n):
+        return Matrix([[(0, 1)[r == c] for c in range(n)] for r in range(n)])
+
+    __radd__ = __add__
+    __rmul__ = __mul__
+    T = property(transpose)
+    ref = property(g_elimination)
+    rref = property(gj_elimination)
+    det = property(determinant)
+
+    # ========== End of Matrix class ==========
+
+def main():
+    A = Matrix([[1, 2], 
+                [3, 4], 
+                [5, 6]])
+    B = Matrix([[1], 
+                [2], 
+                [3]])
+
+    examples = ['print(A)', 
+                'print(A.T)', 
+                'print(A.T.T)', 
+                'print(A.T @ A)', 
+                'print(A / 2)', 
+                'print(A.T @ B)', 
+                'print(B.T @ A)', 
+                'print(B.T @ B)', 
+                'print(Matrix.eye(4))', 
+                'print(Matrix.eye(4) + 2)', 
+                'print(3 + Matrix.eye(4))', 
+                'print(A.flatten())']
+
+    for example in examples:
+        print(example)
+        eval(example)
+
+    bigA = Matrix([[i for i in range(200)] for i in range(200)])
+    bigB = bigA @ bigA
 
 if __name__ == '__main__':
-    A = [[1, 2],
-         [3, 4],
-         [5, 6]]
-    B = [[1], 
-         [2],
-         [3]]
-    A = Matrix(A)
-    B = Matrix(B)
+    main()
 
-    print(A)
-    print(A.T)
-    print(A.T.T)
-    print(A.T @ A)
-#    print((A.T @ A).det)
-    print(A / 2)
-    print(A.T @ B)
-    print(B.T @ A)
-    print(B.T @ B)
-
-    bigA = Matrix([[i for i in range(100)] for i in range(100)])
-    bigB = bigA @ bigA
