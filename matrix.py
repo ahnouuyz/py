@@ -1,43 +1,43 @@
 class Matrix:
+    """ Convenient packaging for a list of lists of numbers.
+        Includes some convenient operations.
+    """
     def __init__(self, ll):
-        self.ll = [[float(val) for val in row] for row in ll]
+        self.ll = [[float(v) for v in row] for row in ll]
         self.shape = len(ll), len(ll[0])
 
     def __str__(self):
-        sll = [[str(val) for val in row] for row in self.ll]
+        sll = [[str(v) for v in row] for row in self.ll]
         cws = [max(map(len, col)) for col in zip(*sll)]
-        sll = [[(cw - len(val)) * ' ' + val 
-                for cw, val in zip(cws, row)] 
+        sll = [[(cw - len(v)) * ' ' + v 
+                for cw, v in zip(cws, row)] 
                 for row in sll]
-        render = [('[[', ' [')[i > 0] 
-                  + '  '.join(row) 
-                  + (']]', ']')[i < len(sll) - 1] 
-                  for i, row in enumerate(sll)]
-        return '\n'.join(render)
+        render = [' [' + '  '.join(row) + ']' for row in sll]
+        return '[' + '\n'.join(render)[1:] + ']'
 
     def __add__(self, other):
         if isinstance(other, (int, float)):
-            return Matrix([[val + other for val in row] for row in self.ll])
+            return Matrix([[v + other for v in row] for row in self.ll])
 
     def __sub__(self, other):
         if isinstance(other, (int, float)):
-            return Matrix([[val - other for val in row] for row in self.ll])
+            return Matrix([[v - other for v in row] for row in self.ll])
 
     def __rsub__(self, other):
         if isinstance(other, (int, float)):
-            return Matrix([[other - val for val in row] for row in self.ll])
+            return Matrix([[other - v for v in row] for row in self.ll])
 
     def __mul__(self, other):
         if isinstance(other, (int, float)):
-            return Matrix([[val * other for val in row] for row in self.ll])
+            return Matrix([[v * other for v in row] for row in self.ll])
 
     def __truediv__(self, other):
         if isinstance(other, (int, float)):
-            return Matrix([[val / other for val in row] for row in self.ll])
+            return Matrix([[v / other for v in row] for row in self.ll])
 
     def __rtruediv__(self, other):
         if isinstance(other, (int, float)):
-            return Matrix([[other / val for val in row] for row in self.ll])
+            return Matrix([[other / v for v in row] for row in self.ll])
 
     def __matmul__(self, other):
         if self.shape[1] != other.shape[0]:
@@ -54,21 +54,28 @@ class Matrix:
         return Matrix(list(zip(*self.ll)))
 
     def flatten(self):
-        return [val for row in self.ll for val in row]
+        return [v for row in self.ll for v in row]
 
     def g_elimination(self):
-        raise NotImplementedError
-
+        ll = self.ll
         r, c = 0, 0
         while r in range(self.shape[0]) and c in range(self.shape[1]):
-            # Find the row with the largest absolute leading number.
-
-            pass
-
-        ll = self.ll
-        pivot_row = self.ll.index(max(lambda x: abs(x[0])))
-
-        return None
+            if max(ll[r:], key=lambda x: abs(x[c])) < 1e-10:
+                # No valid pivots, move to next column.
+                c += 1
+                continue
+            rmax = ll[r:].index(max(ll[r:], key=lambda x: abs(x[c]))) + r
+            print(Matrix(ll[r:]))
+            print(rmax, r)
+            ll[rmax], ll[r] = ll[r], ll[rmax]
+            for i in range(r + 1, self.shape[0]):
+                mult = ll[i][c] / ll[r][c]
+                for j in range(c, self.shape[1]):
+                    ll[i][j] -= ll[r][j] * mult
+            r += 1
+            c += 1
+            print(Matrix(ll))
+        return Matrix(ll)
 
     def gj_elimination(self):
         raise NotImplementedError
@@ -107,6 +114,10 @@ def main():
     B = Matrix([[1], 
                 [2], 
                 [3]])
+    C = Matrix([[1, 2, 3, 4], 
+                [5, 6, 7, 8], 
+                [9, 8, 7, 6], 
+                [5, 4, 3, 2]])
 
     examples = ['print(A)', 
                 'print(A.T)', 
@@ -119,14 +130,16 @@ def main():
                 'print(Matrix.eye(4))', 
                 'print(Matrix.eye(4) + 2)', 
                 'print(3 + Matrix.eye(4))', 
-                'print(A.flatten())']
+                'print(A.flatten())', 
+                'print(C)', 
+                'print(C.g_elimination())']
 
     for example in examples:
         print(example)
         eval(example)
 
-    bigA = Matrix([[i for i in range(200)] for i in range(200)])
-    bigB = bigA @ bigA
+#    bigA = Matrix([[i for i in range(200)] for i in range(200)])
+#    bigB = bigA @ bigA
 
 if __name__ == '__main__':
     main()
