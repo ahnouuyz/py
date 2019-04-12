@@ -60,7 +60,7 @@ class Matrix:
         ll = self.ll
         r, c = 0, 0
         while r in range(self.shape[0]) and c in range(self.shape[1]):
-            if max(ll[r:], key=lambda x: abs(x[c])) < 1e-10:
+            if max(ll[r:], key=lambda x: abs(x[c]))[c] < 1e-10:
                 # No valid pivots, move to next column.
                 c += 1
                 continue
@@ -116,7 +116,7 @@ def main():
                 [3]])
     C = Matrix([[1, 2, 3, 4], 
                 [5, 6, 7, 8], 
-                [9, 8, 7, 6], 
+                [8, 8, 7, 7], 
                 [5, 4, 3, 2]])
 
     examples = ['print(A)', 
