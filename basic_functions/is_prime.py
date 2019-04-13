@@ -17,3 +17,19 @@ def is_prime(n):
             if n % i2 == 0:
                 return False
         return True
+
+def prime_factorial(n):
+    """ Returns the product of all prime numbers up to the given number.
+    """
+    result = 1
+    for i in range(2, n + 1):
+        if is_prime(i):
+            result *= i
+    return result
+
+def list_primes(lo, hi):
+    """ Returns a list of prime numbers between the given numbers.
+    """
+    if lo > hi:
+        lo, hi = hi, lo
+    return [i for i in range(lo, hi + 1) if is_prime(i)]
