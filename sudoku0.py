@@ -2,6 +2,31 @@ import sys
 import random as rd
 from copy import deepcopy
 
+def nl_to_ll(nl):
+    n = int(len(nl) ** 0.5)
+    return [list(nl[r:r + n]) for r in range(0, len(nl), n)]
+
+def nl_to_lll(nl):
+    raise NotImplementedError
+
+    m = int(len(nl) ** 0.25)
+    ll = [list(nl[r:r + m]) for r in range(0, len(nl), m)]
+    return ll
+
+def gen_zeros(n=9):
+    tbl = [['0' for col in range(n)] for row in range(n)]
+    return tbl
+
+def regen_zeros(m=3):
+    tbl = [[['0' for cell in range(m)] 
+            for scol in range(m)] 
+            for row in range(m * m)]
+    return tbl
+
+def lllprint(lll):
+    m = int(len(lll[0]))
+    slll = [[['|'] + [str(v) for v in col] for col in row] for row in lll]
+
 def llprint(ll, is_sudoku=False):
     mv = int(len(ll) ** 0.5)
     mh = int(len(ll[0]) ** 0.5)
@@ -81,14 +106,6 @@ def bt(n=9, init=None):
     llprint(tbls[-1], True)
     return None
 
-def gen_zeros(n=9):
-    tbl = [['0' for col in range(n)] for row in range(n)]
-    return tbl
-
-def nl_to_ll(nl):
-    n = int(len(nl) ** 0.5)
-    return [list(nl[r:r + n]) for r in range(0, len(nl), n)]
-
 def main():
     if len(sys.argv) > 2:
         bt(int(sys.argv[1]), nl_to_ll(sys.argv[2]))
@@ -96,6 +113,7 @@ def main():
         bt(int(sys.argv[1]))
     else:
         bt(9)
+    print(regen_zeros())
 
 if __name__ == '__main__':
     main()
