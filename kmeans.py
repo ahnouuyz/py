@@ -1,4 +1,6 @@
-
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 def assign_points_to_clusters(raw_data_2D, centroids):
     """

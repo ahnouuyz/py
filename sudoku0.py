@@ -6,35 +6,17 @@ def nl_to_ll(nl):
     n = int(len(nl) ** 0.5)
     return [list(nl[r:r + n]) for r in range(0, len(nl), n)]
 
-def nl_to_lll(nl):
-    raise NotImplementedError
+def new_board(n=9):
+    return [['0' for c in range(n)] for r in range(n)]
 
-    m = int(len(nl) ** 0.25)
-    ll = [list(nl[r:r + m]) for r in range(0, len(nl), m)]
-    return ll
-
-def gen_zeros(n=9):
-    tbl = [['0' for col in range(n)] for row in range(n)]
-    return tbl
-
-def regen_zeros(m=3):
-    tbl = [[['0' for cell in range(m)] 
-            for scol in range(m)] 
-            for row in range(m * m)]
-    return tbl
-
-def lllprint(lll):
-    m = int(len(lll[0]))
-    slll = [[['|'] + [str(v) for v in col] for col in row] for row in lll]
-
-def llprint(ll, is_sudoku=False):
+def llprint(ll):
     mv = int(len(ll) ** 0.5)
     mh = int(len(ll[0]) ** 0.5)
-    ll = [[str(v) for v in row] for row in ll]
+    sll = [[str(v) for v in row] for row in ll]
     cws = [max(map(len, col)) for col in zip(*ll)]
     sll = [[(cw - len(v)) * ' ' + v 
             for cw, v in zip(cws, row)] 
-            for row in ll]
+            for row in sll]
 
     preline = [cw * '-' for cw in cws]
     qreline = [cw * '-' for cw in cws]
@@ -52,8 +34,8 @@ def llprint(ll, is_sudoku=False):
     for j in range(mv + 1):
         sll.insert(j * (mv + 1), (hline, gline)[j in (0, mv)])
 
-    for r in sll:
-        print(r)
+    render = '\n'.join(sll)
+    print(render)
 
 def cell_ops(tbl, row, col):
     m = int(len(tbl) ** 0.5)
@@ -81,19 +63,19 @@ def trun(tbls, trys, start=0):
                 tbls[i2 + 1][r][c] = rn
                 trys[i2].append(rn)
                 print(' ' * 60, i2 + 1)
-                llprint(tbls[i2 + 1], True)
+                llprint(tbls[i2 + 1])
             else:
                 break
         else:
             tbls[i2 + 1] = deepcopy(tbls[i2])
             trys[i2].append(tbls[i2][r][c])
-            llprint(tbls[i2 + 1], True)
+            llprint(tbls[i2 + 1])
 
     return tbls, trys, i2
 
-def bt(n=9, init=None):
+def backtrack(n=9, init=None):
     if init == None:
-        tbls = [gen_zeros(n) for _ in range(n * n + 1)]
+        tbls = [new_board(n) for _ in range(n * n + 1)]
     else:
         n = len(init)
         tbls = [init for _ in range(n * n + 1)]
@@ -103,17 +85,16 @@ def bt(n=9, init=None):
     while start < n * n - 1:
         tbls, trys, start = trun(tbls, trys, start - 1)
     print()
-    llprint(tbls[-1], True)
+    llprint(tbls[-1])
     return None
 
 def main():
     if len(sys.argv) > 2:
-        bt(int(sys.argv[1]), nl_to_ll(sys.argv[2]))
+        backtrack(int(sys.argv[1]), nl_to_ll(sys.argv[2]))
     elif len(sys.argv) > 1:
-        bt(int(sys.argv[1]))
+        backtrack(int(sys.argv[1]))
     else:
-        bt(9)
-    print(regen_zeros())
+        backtrack(9)
 
 if __name__ == '__main__':
     main()

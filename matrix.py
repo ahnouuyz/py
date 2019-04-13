@@ -4,14 +4,14 @@ class Matrix:
     """ Convenient packaging for a list of lists of numbers.
         Includes some convenient operations.
         Short-term goal: 
-            Perform simple linear regression.
+            Simple linear regression.
     """
     def __init__(self, ll):
         self.ll = [[float(v) for v in row] for row in ll]
         self.shape = len(ll), len(ll[0])
 
     def __str__(self):
-        sll = [[str(v) for v in row] for row in self.ll]
+        sll = [[str(v)[:10] for v in row] for row in self.ll]
         cws = [max(map(len, col)) for col in zip(*sll)]
         sll = [[(cw - len(v)) * ' ' + v 
                 for cw, v in zip(cws, row)] 
@@ -65,7 +65,7 @@ class Matrix:
         det = 1
         r, c = 0, 0
         while r < self.shape[0] - 1 and c < self.shape[1] - 1:
-            if max(ll[r:], key=lambda x: abs(x[c]))[c] < 1e-10:
+            if abs(max(ll[r:], key=lambda x: abs(x[c]))[c]) < 1e-10:
                 c += 1
                 continue
             disp = ll[r:].index(max(ll[r:], key=lambda x: abs(x[c])))
@@ -73,7 +73,7 @@ class Matrix:
             if disp:
                 ll[r + disp], ll[r] = ll[r], ll[r + disp]
                 det *= -1
-            
+
             for i in range(r + 1, self.shape[0]):
                 mult = ll[i][c] / ll[r][c]
                 for j in range(c, self.shape[1]):
@@ -140,20 +140,19 @@ class Matrix:
 
     # ========== End of Matrix class ==========
 
-def main():
+def tests():
     A = Matrix([[1, 2], 
                 [3, 4], 
                 [5, 6]])
     B = Matrix([[1], 
                 [2], 
                 [3]])
-    C = Matrix([[1, 2, 3, 4], 
-                [5, 6, 7, 8], 
-                [8, 8, 7, 7], 
-                [5, 4, 3, 3]])
+    C = Matrix([[0, 2, 1, -8], 
+                [1, -2, -3, 0], 
+                [-1, 1, 2, 3]])
     D = Matrix([[2, 4], 
                 [6, 8]])
-    E = Matrix.rand((4, 4))
+    E = Matrix.rand((5, 5), (0, 5))
 
     examples = ['print(A)', 
                 'print(A.T)', 
@@ -163,13 +162,10 @@ def main():
                 'print(A.T @ B)', 
                 'print(B.T @ A)', 
                 'print(B.T @ B)', 
-                'print(Matrix.eye(4))', 
-                'print(Matrix.eye(4) + 2)', 
-                'print(3 + Matrix.eye(4))', 
                 'print(A.flatten())', 
                 'print(C)', 
                 'print(C.ref)', 
-                'print(Matrix.rand((3, 3)))', 
+#                'print(C.rref)', 
                 'print(E)', 
                 'print(E.ref)']
 
@@ -181,5 +177,5 @@ def main():
 #    bigB = bigA @ bigA
 
 if __name__ == '__main__':
-    main()
+    tests()
 
