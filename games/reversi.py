@@ -1,5 +1,4 @@
 import random as rd
-from time import sleep
 
 class Reversi:
     def __init__(self):
@@ -90,13 +89,12 @@ class Reversi:
             r = '12345678'.index(string[1])
             c = 'abcdefgh'.index(string[0])
             return r, c
+        elif string[0] == 'q':
+            return 'quit'
         else:
             print('Invalid input, please try again.')
 
     def run_two_players(self, autoplay=False):
-        """ 
-            Add an option to quit.
-        """
         while self.spaces:
             self.valid_moves = self.get_valid_moves()
             if len(self.valid_moves) <= 0:
@@ -113,13 +111,14 @@ class Reversi:
                 pos = rd.sample(self.valid_moves, 1)[0]
             else:
                 pos = self.position(input('Enter a position: '))
+                if pos == 'quit':
+                    break
 
             if pos:
                 print(f'Player {self.player} chose: {self.hpos[pos]}')
                 self.next_state(pos)
             self.round += 1
             print('-' * 60)
-            sleep(0.1)
 
         print('\nGame over!')
         self.print_board()
@@ -151,10 +150,6 @@ class Reversi:
         return max_pos
 
     def run_single_player(self, autoplay=False):
-        """ 
-            UNDER CONSTRUCTION
-            Add a option to quit.
-        """
         while self.spaces:
             self.valid_moves = self.get_valid_moves()
             if len(self.valid_moves) <= 0:
@@ -174,6 +169,8 @@ class Reversi:
                     pos = rd.sample(self.valid_moves, 1)[0]
                 else:
                     pos = self.position(input('Enter a position: '))
+                    if pos == 'quit':
+                        break
 
             if pos:
                 print(f'Player {self.player} chose: {self.hpos[pos]}')

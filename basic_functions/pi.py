@@ -30,8 +30,8 @@ def spigot(precision):
     while abs(pie - pi) > precision:
         n += 1
         intermediate_product = 1
-        for i2 in range(2, n + 1):
-            intermediate_product *= (i2 - 1) / (i2 * 2 - 1)
+        for i in range(2, n + 1):
+            intermediate_product *= (i - 1) / (i * 2 - 1)
         spigot_sum += intermediate_product
         pie = spigot_sum * 2
     return pie, n
@@ -46,17 +46,16 @@ def print_results(results):
     for i, steps in results:
         print(f'Algorithm {i} finished in {steps} steps')
 
-def test():
-    examples = ['basel(0.1)',
-                'taylor(0.2)',
-                'wallis(0.2)',
-                'spigot(0.1)',
-                'race(0.01, [taylor, wallis, basel])',
+def tests():
+    examples = ['print(basel(0.1))',
+                'print(taylor(0.2))',
+                'print(wallis(0.2))',
+                'print(spigot(0.1))',
+                'print(race(0.01, [taylor, wallis, basel]))',
                 'print_results(race(0.01, [taylor, wallis, basel]))']
-
     for example in examples:
-        print(example, ':', eval(example))
+        print(example)
+        eval(example)
 
 if __name__ == '__main__':
-    test()
-    pass
+    tests()
