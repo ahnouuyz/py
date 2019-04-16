@@ -1,4 +1,3 @@
-import sys
 import time
 import pyautogui as pag
 
@@ -43,7 +42,7 @@ def person_filling(person):
 
 
 def first_page(page, first_entry=True):
-    activate_page(delay=0)
+    activate_page()
     pag.typewrite(page[0])
     pag.press('\t')
     pag.typewrite(page[1])
@@ -64,7 +63,8 @@ def sears(pages, person=None):
     if len(pages) != 3:
         raise ValueError('Incorrect number of pages, expected 3.')
     # Skip the first page.
-    next_page(delay=3)
+    time.sleep(2)
+    next_page()
     for i, page in enumerate(pages):
         if len(page) != 13:
             raise ValueError
@@ -151,12 +151,17 @@ def les(part1, part2, person=None):
 def skip_les():
     for i in range(16):
         time.sleep(2)
-        next_page(delay=2)
+        next_page()
 
 def skip_brief2():
     for i in range(7):
         time.sleep(2)
-        next_page(delay=2)
+        next_page()
+
+def skip_ace():
+    for i in range(2):
+        time.sleep(2)
+        next_page()
 
 def ace(pages, person=None):
     if len(pages) != 2:
@@ -173,62 +178,88 @@ def ace(pages, person=None):
 def pcq():
     pass
 
+def skip_pcq():
+    for i in range(38):
+        print(f'Skipping page {i + 1}...')
+        if i in [13, 20, 22, 24]:
+            print(f'Adding spaces to page {i + 1}...')
+            activate_page(delay=3)
+            pag.press('space')
+            pag.press('\t')
+            pag.press('space')
+        elif i == 18:
+            print(f'Adding spaces to page {i + 1}...')
+            activate_page(delay=3)
+            pag.press('space')
+        elif i == 31:
+            print(f'Adding spaces to page {i + 1}...')
+            time.sleep(3)
+            pag.click(100, 100)
+            for i in range(6):
+                pag.hotkey('shift', '\t')
+            pag.press('space')
+        else:
+            time.sleep(2)
+        next_page()
 
 
 def main():
-    page1 = ['010-20210-011', 'Roscoe', '16/04/2019']
+    page1 = ['010-20257', 'Roscoe', '16/04/2019']
     first_page(page1, first_entry=True)
     skip_cbcl()
-    sears39 = [[2, 3, 1, 2, 2, 3, 4, 4, 4, 2, 3, 3, 4],
-               [4, 3, 4, 2, 2, 2, 2, 1, 2, 2, 3, 2, 3],
-               [3, 4, 2, 4, 2, 2, 2, 4, 1, 2, 2, 1, 2]]
-    sears(sears39, 'mother')
-    pss10 = [3, 3, 3, 3, 4, 3, 3, 3, 4, 4]
-    pss(pss10, 'mother')
+    sears39 = [[1, 1, 1, 2, 2, 2, 2, 2, 4, 3, 3, 3, 3],
+               [2, 3, 3, 3, 3, 4, 4, 4, 3, 3, 3, 3, 2],
+               [4, 4, 3, 2, 3, 3, 3, 4, 3, 3, 3, 3, 2]]
+    sears(sears39, 'father')
+    pss10 = [3, 3, 4, 4, 1, 2, 3, 3, 3, 2]
+    pss(pss10, 'father')
     next_page()
-    srs65 = [[1, 2, 3, 3, 4, 1, 2, 1, 1, 2, 4],
-             [4, 1, 1, 1, 2, 3, 1, 1, 1, 1, 4],
-             [1, 1, 2, 3, 1, 2, 1, 2, 3, 4, 1],
-             [1, 2, 1, 1, 2, 1, 3, 1, 1, 3, 1],
-             [2, 1, 2, 2, 2, 1, 2, 3, 1, 1, 2],
-             [4, 2, 1, 2, 1, 2, 2, 3, 1, 1]]
-    srs(srs65, 'mother')
+    srs65 = [[1, 1, 1, 2, 3, 3, 3, 2, 3, 2, 3],
+             [3, 3, 2, 2, 1, 1, 1, 1, 2, 2, 2],
+             [1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3],
+             [2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+             [2, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3],
+             [2, 1, 1, 1, 1, 1, 1, 2, 2, 2]]
+    srs(srs65, 'father')
     next_page()
-    bsi53 = [[1, 1, 1, 1, 3, 3, 1, 1, 1, 1],
-             [1, 1, 3, 1, 1, 1, 1, 1, 1, 2],
-             [1, 1, 1, 1, 2, 1, 3, 1, 1, 1],
-             [1, 2, 1, 1, 2, 1, 1, 1, 1, 1],
-             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1]]
-    bsi(bsi53, 'mother')
+    bsi53 = [[3, 3, 2, 4, 3, 3, 1, 2, 2, 1],
+             [2, 2, 2, 1, 2, 2, 2, 3, 3, 3],
+             [3, 3, 2, 2, 1, 1, 1, 1, 1, 2],
+             [2, 2, 2, 1, 1, 2, 2, 2, 1, 1],
+             [1, 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 1, 1]]
+    bsi(bsi53, 'father')
     next_page()
-    mspss12 = [[4, 4, 4, 3, 4, 4],
-               [3, 3, 4, 4, 3, 4]]
-    mspss(mspss12, 'mother')
+    mspss12 = [[3, 3, 4, 4, 4, 3],
+               [2, 4, 4, 4, 4, 4]]
+    mspss(mspss12, 'father')
     next_page()
 
-    les47a = [[1, 1, 1, 1],
-              [3, 1, 1, 1, 1, 1, 1],
-              [3, 1, 1, 1, 1, 1, 1, 2, 2],
-              [1, 1, 1, 1, 1, 1, 1, 1],
-              [2, 1, 3, 3, 1, 2, 1, 1, 1, 1],
-              [3, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-              [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
-    les47b = [[],
-              [3],
-              [2, 2, 6],
-              [],
-              [2, 3, 1, 7],
-              [2],
-              []]
-    les(les47a, les47b, 'mother')
-    next_page()
-    
+##    les47a = [[1, 1, 1, 1],
+##              [3, 1, 1, 1, 1, 1, 1],
+##              [3, 1, 1, 1, 1, 1, 1, 2, 2],
+##              [1, 1, 1, 1, 1, 1, 1, 1],
+##              [2, 1, 3, 3, 1, 2, 1, 1, 1, 1],
+##              [3, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+##              [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+##    les47b = [[],
+##              [3],
+##              [2, 2, 6],
+##              [],
+##              [2, 3, 1, 7],
+##              [2],
+##              []]
+##    les(les47a, les47b, 'mother')
+##    next_page()
+
+    skip_les()
     skip_brief2()
-
-    ace10 = [[1, 2, 2, 1, 2],
-             [2, 2, 2, 2, 2]]
-    ace(ace10, 'mother')
-    next_page()
+    skip_ace()
+    skip_pcq()
+##
+##    ace10 = [[1, 2, 2, 1, 2],
+##             [2, 2, 2, 2, 2]]
+##    ace(ace10, 'mother')
+##    next_page()
 
     # Primary Caregiver Questionnaire
     # This will be extremely challenging...
