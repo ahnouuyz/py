@@ -1,3 +1,8 @@
+""" Qualtrics is not an ideal data entry tool.
+    It's an experience not to be missed...
+    ... alright, it totally can be missed.
+"""
+
 import time
 import pyautogui as pag
 
@@ -8,6 +13,8 @@ REDPOS = (1, 80)
 TIMEOUT = 10
 
 def wait():
+    """ Need to find an event that is unique to completing a page load.
+    """
     start_time = time.time()
     while pag.screenshot().getpixel(REDPOS) != REDCOLOR:
         elapsed_time = time.time() - start_time
@@ -40,6 +47,12 @@ def select_option(option_number):
     else:
         pag.press('right', presses=option_number - 1)
 
+def fill_page(page):
+    activate_page()
+    for val in page:
+        select_option(val)
+        pag.press('\t')
+
 def person_filling(person=None):
     if person == 'mother':
         pag.press('space')
@@ -48,7 +61,7 @@ def person_filling(person=None):
     elif person == None:
         pass
     else:
-        raise StopError('Manually select person filling in.')
+        raise ValueError('Person filling in not recognized.')
 
 
 
@@ -79,10 +92,11 @@ def sears(pages, person=None):
     for i, page in enumerate(pages):
         if len(page) != 13:
             raise ValueError
-        activate_page()
-        for val in page:
-            select_option(val)
-            pag.press('\t')
+        fill_page(page)
+#        activate_page()
+#        for val in page:
+#            select_option(val)
+#            pag.press('\t')
         if i < 2:
             # Go to next page.
             next_page()
@@ -91,10 +105,11 @@ def sears(pages, person=None):
 def pss(page, person=None):
     if len(page) != 10:
         raise ValueError('Incorrect number of values, expected 10.')
-    activate_page()
-    for val in page:
-        select_option(val)
-        pag.press('\t')
+    fill_page(page)
+#    activate_page()
+#    for val in page:
+#        select_option(val)
+#        pag.press('\t')
     person_filling(person)
 
 def skip_pss():
@@ -110,10 +125,11 @@ def srs(pages, person=None):
     if len(pages) != 6:
         raise ValueError('Incorrect number of pages, expected 6.')
     for i, page in enumerate(pages):
-        activate_page()
-        for val in page:
-            select_option(val)
-            pag.press('\t')
+        fill_page(page)
+#        activate_page()
+#        for val in page:
+#            select_option(val)
+#            pag.press('\t')
         if i < 5:
             next_page()
     person_filling(person)
@@ -122,10 +138,11 @@ def bsi(pages, person=None):
     if len(pages) != 5:
         raise ValueError('Incorrect number of pages, expected 5.')
     for i, page in enumerate(pages):
-        activate_page()
-        for val in page:
-            select_option(val)
-            pag.press('\t')
+        fill_page(page)
+#        activate_page()
+#        for val in page:
+#            select_option(val)
+#            pag.press('\t')
         if i < 4:
             next_page()
     person_filling(person)
@@ -134,10 +151,11 @@ def mspss(pages, person=None):
     if len(pages) != 2:
         raise ValueError('Incorrect number of pages, expected 2.')
     for i, page in enumerate(pages):
-        activate_page()
-        for val in page:
-            select_option(val)
-            pag.press('\t')
+        fill_page(page)
+#        activate_page()
+#        for val in page:
+#            select_option(val)
+#            pag.press('\t')
         if i < 1:
             next_page()
     person_filling(person)
@@ -154,10 +172,11 @@ def les(part1, part2, person=None):
                 pag.press('\t')
         if any(x != 1 for x in part1[i]):
             next_page()
-            activate_page()
-            for val in part2[i]:
-                select_option(val)
-                pag.press('\t')
+            fill_page(part2[i])
+#            activate_page()
+#            for val in part2[i]:
+#                select_option(val)
+#                pag.press('\t')
         if i < 6:
             next_page()
     next_page()
@@ -191,10 +210,11 @@ def ace(pages, person=None):
     if len(pages) != 2:
         raise ValueError('Incorrect number of pages, expected 2.')
     for i, page in enumerate(pages):
-        activate_page()
-        for val in page:
-            select_option(val)
-            pag.press('\t')
+        fill_page(page)
+#        activate_page()
+#        for val in page:
+#            select_option(val)
+#            pag.press('\t')
         if i < 1:
             next_page()
     person_filling(person)
