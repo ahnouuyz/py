@@ -1,8 +1,19 @@
 import time
 import pyautogui as pag
 
-pag.PAUSE = 0.1
+pag.PAUSE = 0.05
 pag.FAILSAFE = True
+REDCOLOR = (195, 36, 50)
+REDPOS = (1, 80)
+TIMEOUT = 10
+
+def wait():
+    start_time = time.time()
+    while pag.screenshot().getpixel(REDPOS) != REDCOLOR:
+        elapsed_time = time.time() - start_time
+        if elapsed_time > TIMEOUT:
+            raise TimeoutError('Timeout on wait().')
+    time.sleep(0.5)
 
 def next_page():
     pag.click(100, 100)
@@ -16,8 +27,8 @@ def prev_page():
         pag.hotkey('shift', '\t')
     pag.press('enter')
 
-def activate_page(delay=2):
-    time.sleep(delay)
+def activate_page():
+    wait()
     pag.click(100, 100)
     pag.press('\t', presses=2)
 
@@ -29,12 +40,12 @@ def select_option(option_number):
     else:
         pag.press('right', presses=option_number - 1)
 
-def person_filling(person):
+def person_filling(person=None):
     if person == 'mother':
         pag.press('space')
     elif person == 'father':
         pag.press('right')
-    elif person == 0:
+    elif person == None:
         pass
     else:
         raise StopError('Manually select person filling in.')
@@ -56,14 +67,14 @@ def first_page(page, first_entry=True):
 
 def skip_cbcl():
     for i in range(13):
-        time.sleep(2)
+        wait()
         next_page()
 
 def sears(pages, person=None):
     if len(pages) != 3:
         raise ValueError('Incorrect number of pages, expected 3.')
     # Skip the first page.
-    time.sleep(2)
+    wait()
     next_page()
     for i, page in enumerate(pages):
         if len(page) != 13:
@@ -76,7 +87,6 @@ def sears(pages, person=None):
             # Go to next page.
             next_page()
     person_filling(person)
-    next_page()
 
 def pss(page, person=None):
     if len(page) != 10:
@@ -86,6 +96,15 @@ def pss(page, person=None):
         select_option(val)
         pag.press('\t')
     person_filling(person)
+
+def skip_pss():
+    wait()
+    next_page()
+
+def skip_srs():
+    for i in range(6):
+        wait()
+        next_page()
 
 def srs(pages, person=None):
     if len(pages) != 6:
@@ -103,7 +122,7 @@ def bsi(pages, person=None):
     if len(pages) != 5:
         raise ValueError('Incorrect number of pages, expected 5.')
     for i, page in enumerate(pages):
-        activate_page(delay=3)
+        activate_page()
         for val in page:
             select_option(val)
             pag.press('\t')
@@ -115,7 +134,7 @@ def mspss(pages, person=None):
     if len(pages) != 2:
         raise ValueError('Incorrect number of pages, expected 2.')
     for i, page in enumerate(pages):
-        activate_page(delay=3)
+        activate_page()
         for val in page:
             select_option(val)
             pag.press('\t')
@@ -127,7 +146,7 @@ def les(part1, part2, person=None):
     if len(part1) != 7:
         raise ValueError('Incorrect number of pages, expected 7.')
     for i in range(len(part1)):
-        activate_page(delay=3)
+        activate_page()
         for j in range(len(part1[i])):
             select_option(part1[i][j])
             pag.press('\t')
@@ -143,31 +162,36 @@ def les(part1, part2, person=None):
             next_page()
     next_page()
     # Skip others.
-    time.sleep(2)
+    wait()
     next_page()
     activate_page()
     person_filling(person)
 
 def skip_les():
     for i in range(16):
-        time.sleep(2)
+        wait()
         next_page()
 
 def skip_brief2():
     for i in range(7):
-        time.sleep(2)
+        wait()
         next_page()
 
 def skip_ace():
     for i in range(2):
-        time.sleep(2)
+        wait()
+        next_page()
+
+def skip_sears():
+    for i in range(4):
+        wait()
         next_page()
 
 def ace(pages, person=None):
     if len(pages) != 2:
         raise ValueError('Incorrect number of pages, expected 2.')
     for i, page in enumerate(pages):
-        activate_page(delay=3)
+        activate_page()
         for val in page:
             select_option(val)
             pag.press('\t')
@@ -180,86 +204,94 @@ def pcq():
 
 def skip_pcq():
     for i in range(38):
+        pag.press('end')
         print(f'Skipping page {i + 1}...')
         if i in [13, 20, 22, 24]:
             print(f'Adding spaces to page {i + 1}...')
-            activate_page(delay=3)
+            activate_page()
             pag.press('space')
             pag.press('\t')
             pag.press('space')
         elif i == 18:
             print(f'Adding spaces to page {i + 1}...')
-            activate_page(delay=3)
+            activate_page()
             pag.press('space')
         elif i == 31:
             print(f'Adding spaces to page {i + 1}...')
-            time.sleep(3)
+            wait()
             pag.click(100, 100)
             for i in range(6):
                 pag.hotkey('shift', '\t')
             pag.press('space')
         else:
-            time.sleep(2)
+            wait()
         next_page()
 
 
 def main():
-    page1 = ['010-20257', 'Roscoe', '16/04/2019']
+    page1 = ['010-20289', 'Roscoe', '16/04/2019']
     first_page(page1, first_entry=True)
     skip_cbcl()
-    sears39 = [[1, 1, 1, 2, 2, 2, 2, 2, 4, 3, 3, 3, 3],
-               [2, 3, 3, 3, 3, 4, 4, 4, 3, 3, 3, 3, 2],
-               [4, 4, 3, 2, 3, 3, 3, 4, 3, 3, 3, 3, 2]]
-    sears(sears39, 'father')
-    pss10 = [3, 3, 4, 4, 1, 2, 3, 3, 3, 2]
-    pss(pss10, 'father')
+    
+##    skip_sears()
+##    skip_pss()
+##    skip_srs()
+        
+    sears39 = [[4, 3, 2, 4, 3, 3, 3, 3, 2, 2, 3, 3, 3],
+               [3, 2, 2, 3, 3, 3, 3, 2, 3, 1, 4, 2, 3],
+               [2, 3, 2, 3, 2, 2, 2, 4, 2, 2, 3, 2, 2]]
+    sears(sears39, 'mother')
     next_page()
-    srs65 = [[1, 1, 1, 2, 3, 3, 3, 2, 3, 2, 3],
-             [3, 3, 2, 2, 1, 1, 1, 1, 2, 2, 2],
-             [1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 3],
-             [2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-             [2, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3],
-             [2, 1, 1, 1, 1, 1, 1, 2, 2, 2]]
-    srs(srs65, 'father')
+    pss10 = [1, 1, 3, 4, 4, 2, 3, 4, 3, 1]
+    pss(pss10, 'mother')
     next_page()
-    bsi53 = [[3, 3, 2, 4, 3, 3, 1, 2, 2, 1],
-             [2, 2, 2, 1, 2, 2, 2, 3, 3, 3],
-             [3, 3, 2, 2, 1, 1, 1, 1, 1, 2],
-             [2, 2, 2, 1, 1, 2, 2, 2, 1, 1],
-             [1, 1, 1, 1, 1, 2, 1, 2, 2, 2, 2, 1, 1]]
-    bsi(bsi53, 'father')
+    srs65 = [[4, 1, 4, 1, 2, 2, 3, 1, 2, 2, 4],
+             [4, 2, 1, 4, 1, 1, 2, 2, 1, 4, 3],
+             [1, 1, 2, 3, 2, 2, 1, 1, 2, 3, 1],
+             [1, 1, 1, 1, 3, 2, 3, 1, 1, 4, 2],
+             [3, 1, 2, 4, 2, 1, 1, 1, 1, 1, 3],
+             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+    srs(srs65, None)
     next_page()
-    mspss12 = [[3, 3, 4, 4, 4, 3],
-               [2, 4, 4, 4, 4, 4]]
-    mspss(mspss12, 'father')
+    bsi53 = [[2, 1, 1, 2, 2, 2, 1, 1, 1, 5],
+             [1, 2, 1, 2, 1, 1, 1, 2, 1, 5],
+             [1, 1, 1, 3, 2, 4, 2, 1, 1, 1],
+             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+             [1, 1, 1, 1, 1, 1, 1, 5, 1, 1, 5, 1, 1]]
+    bsi(bsi53, 'mother')
+    next_page()
+    mspss12 = [[5, 5, 5, 5, 5, 5],
+               [5, 5, 5, 5, 5, 5]]
+    mspss(mspss12, 'mother')
     next_page()
 
-##    les47a = [[1, 1, 1, 1],
-##              [3, 1, 1, 1, 1, 1, 1],
-##              [3, 1, 1, 1, 1, 1, 1, 2, 2],
-##              [1, 1, 1, 1, 1, 1, 1, 1],
-##              [2, 1, 3, 3, 1, 2, 1, 1, 1, 1],
-##              [3, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-##              [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
-##    les47b = [[],
-##              [3],
-##              [2, 2, 6],
-##              [],
-##              [2, 3, 1, 7],
-##              [2],
-##              []]
-##    les(les47a, les47b, 'mother')
-##    next_page()
+    les47a = [[0, 1, 1, 0],
+              [1, 1, 1, 1, 1, 1, 1],
+              [0, 0, 1, 0, 1, 1, 1, 0, 0],
+              [1, 1, 1, 1, 1, 1, 1, 1],
+              [0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
+              [0, 1, 1, 0, 0, 0, 0, 0, 1, 0],
+              [0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1]]
+    les47b = [[6, 2],
+              [],
+              [3, 4, 6, 6, 6],
+              [],
+              [4, 4, 3, 6, 4, 4, 4],
+              [5, 5, 4, 4, 4, 4, 4],
+              [3, 3, 4]]
+    les(les47a, les47b, 'father')
+    next_page()
 
-    skip_les()
+##    skip_les()
+
     skip_brief2()
-    skip_ace()
-    skip_pcq()
-##
-##    ace10 = [[1, 2, 2, 1, 2],
-##             [2, 2, 2, 2, 2]]
-##    ace(ace10, 'mother')
-##    next_page()
+    
+    ace10 = [[2, 2, 2, 2, 2],
+             [1, 1, 2, 2, 1]]
+    ace(ace10, 'mother')
+    next_page()
+##    skip_ace()
+##    skip_pcq()
 
     # Primary Caregiver Questionnaire
     # This will be extremely challenging...
