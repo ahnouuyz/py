@@ -5,11 +5,11 @@
 import time
 import pyautogui as pag
 
-pag.PAUSE = 0.05
+pag.PAUSE = 0.02
 pag.FAILSAFE = True
 REDCOLOR = (195, 36, 50)
 REDPOS = (1, 80)
-TIMEOUT = 8
+TIMEOUT = 60
 
 def wait(delay=0.5):
     """ Need to find an event that is unique to completing a page load.
@@ -43,7 +43,12 @@ def select_option(option_number):
 def fill_page(page):
     activate_page()
     for val in page:
-        select_option(val)
+        if isinstance(val, int):
+            select_option(val)
+        elif isinstance(val, str):
+            pag.typewrite(val)
+        else:
+            raise TypeError('Only int and str types recognized.')
         pag.press('\t')
 
 def person_filling(person=None):
@@ -51,6 +56,8 @@ def person_filling(person=None):
         pag.press('space')
     elif person == 'father':
         pag.press('right')
+    elif person == 'maid':
+        pag.press('right', presses=6)
     elif person == None:
         pass
     else:
@@ -67,15 +74,6 @@ def first_page(metadata, first_entry=True):
     pag.press('\t')
     pag.typewrite([('down', 'space')[first_entry], '\t'])
     pag.typewrite(date)
-#    pag.typewrite(page[0])
-#    pag.press('\t')
-#    pag.typewrite(page[1])
-#    pag.press('\t')
-#    if first_entry:
-#        pag.typewrite(['space', '\t'])
-#    else:
-#        pag.typewrite(['down', '\t'])
-#    pag.typewrite(page[2])
     next_page()
 
 def skip(saq):
@@ -93,57 +91,19 @@ def skip(saq):
         next_page()
 
 def fill_pages(pages, saq, person):
-    """ sears
+    """ cbcl
+        sears
         pss
         srs
         bsi
         mspss
         ace
     """
-    if pages:
-        for i, page in enumerate(pages):
-            fill_page(page)
-            if i == len(pages) - 1:
-                person_filling(person)
-            next_page()
-    else:
-        skip(saq)
-
-def les(part1, part2, person=None):
-    for i, (page1, page2) in enumerate(zip(part1, part2)):
-        activate_page()
-        for j, val in enumerate(page1):
-            select_option(val)
-            pag.press('\t')
-            if (i == 1 and j == 5) or (i == 3 and j == 6):
-                pag.press('\t')
-        if any(x != 1 for x in page1):
-            next_page()
-            fill_page(page2)
+    for i, page in enumerate(pages):
+        fill_page(page)
+        if i == len(pages) - 1:
+            person_filling(person)
         next_page()
-    wait()
-    next_page()
-    activate_page()
-    person_filling(person)
-    next_page()
-
-#    for i in range(len(part1)):
-#        activate_page()
-#        for j in range(len(part1[i])):
-#            select_option(part1[i][j])
-#            pag.press('\t')
-#            if (i == 1 and j == 5) or (i == 3 and j == 6):
-#                pag.press('\t')
-#        if any(x != 1 for x in part1[i]):
-#            next_page()
-#            fill_page(part2[i])
-#        if i < 6:
-#            next_page()
-#    next_page()
-#    wait()
-#    next_page()
-#    activate_page()
-#    person_filling(person)
 
 def pcq():
     pass
@@ -175,61 +135,94 @@ def skip_pcq():
             wait()
         next_page()
 
-
 def main():
-    metadata = ['010-20289', 'Roscoe', '16/04/2019']
+    metadata = ('010-20861', 'Roscoe', '17/04/2019')
+    first_page(metadata, first_entry=True)
+
+    cbcl112 = [[2, '', 1, 3, 2, 1, 1, 2, 2, '', 2, 2],
+               [2, 2, 1, 2, 1, 1, 1, 1, 2, 1],
+               [1, 2, 1, 2, 1, 2, 2, 2, '', 3, 2],
+               [2, 1, 1, 1, 1, 1, 1, 2, 1, '', 1],
+               [1, 1, 1, 1, 1, '', 1, 2, 1, 1, 1],
+               [1, 1, 1, 1, 1],
+               [1, 1, 1, '', 1, 1, 1, 1, '', 1],
+               [1, '', 1, 1, 1],
+               [1, 1, 2, 2, 1, '', 1, 1, 1, 1, '', 1],
+               [2, 1, '', 1, 1, 2, 1, '', 1, 1, '', 1, 1],
+               [1, 1, '', 1, '', 1, '', 1, 1, 1, 1, 1, 1],
+               [1, '', 1, 2, 1, 1, 1, 1, 1, 1, '', 1],
+               [1, 1, 1, 1, '', 1, 1, 1, 1, 1, 1, 1, 1]]
+    fill_pages(cbcl112, 'cbcl', 'mother')
+##    skip('cbcl')
+
     sears39 = [[],
-               [4, 3, 2, 4, 3, 3, 3, 3, 2, 2, 3, 3, 3],
-               [3, 2, 2, 3, 3, 3, 3, 2, 3, 1, 4, 2, 3],
-               [2, 3, 2, 3, 2, 2, 2, 4, 2, 2, 3, 2, 2]]
-    pss10 = [[1, 1, 3, 4, 4, 2, 3, 4, 3, 1]]
-    srs65 = [[4, 1, 4, 1, 2, 2, 3, 1, 2, 2, 4],
-             [4, 2, 1, 4, 1, 1, 2, 2, 1, 4, 3],
-             [1, 1, 2, 3, 2, 2, 1, 1, 2, 3, 1],
-             [1, 1, 1, 1, 3, 2, 3, 1, 1, 4, 2],
-             [3, 1, 2, 4, 2, 1, 1, 1, 1, 1, 3],
+               [3, 3, 2, 2, 2, 3, 4, 3, 2, 2, 2, 2, 3],
+               [3, 3, 3, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2],
+               [2, 2, 2, 3, 2, 2, 2, 3, 1, 2, 1, 2, 2]]
+    fill_pages(sears39, 'sears', 'mother')
+##    skip('sears')
+    
+    pss10 = [[3, 3, 3, 5, 3, 3, 4, 4, 3, 3]]
+    fill_pages(pss10, 'pss', None)
+##    skip('pss')
+    
+    srs65 = [[1, 1, 3, 2, 3, 1, 2, 1, 1, 2, 3],
+             [3, 2, 1, 4, 1, 4, 1, 2, 1, 2, 4],
+             [1, 1, 1, 2, 1, 2, 1, 1, 2, 2, 1],
+             [1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1],
+             [2, 1, 1, 2, 1, 1, 1, 2, 1, 1, 2],
              [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
-    bsi53 = [[2, 1, 1, 2, 2, 2, 1, 1, 1, 5],
-             [1, 2, 1, 2, 1, 1, 1, 2, 1, 5],
-             [1, 1, 1, 3, 2, 4, 2, 1, 1, 1],
+    fill_pages(srs65, 'srs', 'mother')
+##    skip('srs')
+    
+    bsi53 = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
              [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-             [1, 1, 1, 1, 1, 1, 1, 5, 1, 1, 5, 1, 1]]
+             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+    fill_pages(bsi53, 'bsi', 'mother')
+##    skip('bsi')
+    
     mspss12 = [[5, 5, 5, 5, 5, 5],
                [5, 5, 5, 5, 5, 5]]
-    les47a = [[0, 1, 1, 0],
-              [1, 1, 1, 1, 1, 1, 1],
-              [0, 0, 1, 0, 1, 1, 1, 0, 0],
-              [1, 1, 1, 1, 1, 1, 1, 1],
-              [0, 0, 0, 0, 0, 0, 0, 1, 1, 1],
-              [0, 1, 1, 0, 0, 0, 0, 0, 1, 0],
-              [0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1]]
-    les47b = [[6, 2],
-              [],
-              [3, 4, 6, 6, 6],
-              [],
-              [4, 4, 3, 6, 4, 4, 4],
-              [5, 5, 4, 4, 4, 4, 4],
-              [3, 3, 4]]
-    ace10 = [[2, 2, 2, 2, 2],
-             [1, 1, 2, 2, 1]]
-
-    first_page(metadata, first_entry=True)
-    skip('cbcl')
-
-    fill_pages(sears39, 'sears', 'mother')
-    fill_pages(pss10, 'pss', 'mother')
-    fill_pages(srs65, 'srs', None)
-    fill_pages(bsi53, 'bsi', 'mother')
     fill_pages(mspss12, 'mspss', 'mother')
+##    skip('mspss')
 
-    les(les47a, les47b, 'father')
-#    skip_les()
+    les47 = [[0, 1, 1, 1],
+             [7],
+             [1, 0, 0, 0, 0, 0, '', 0],
+             [0, 0, 0, 0, 0, '', 0],
+             [1, 1, 1, 0, 1, 0, 1, 1, 1],
+             [7, 0],
+             [1, 0, 0, 0, 0, 0, 0, '', 0],
+             [0, 0, 0, 0, 0, 0, '', 0],
+             [1, 1, 1, 0, 1, 1, 1, 1, 1, 1],
+             [7],
+             [1, 0, 1, 1, 1, 1, 1, 0, 1, 1],
+             [0, 0],
+             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+##             [],
+             [],
+             []]
+    fill_pages(les47, 'les', 'mother')
+##    skip('les')
 
-    skip('brief2')
+    brief2_63 = [[],
+                 [1, 1, 1, 2, 1, 1, 2, 2, 1, 1],
+                 [1, 2, 2, 1, 2, 1, 1, 1, 1, 2],
+                 [1, 1, 2, 2, 1, 2, 1, 1, 2, 1],
+                 [1, 1, 1, 1, 1, 1, 1, 2, 1, 1],
+                 [2, 1, 1, 1, 2, 2, 2, 1, 1, 1],
+                 [2, 2, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 2]]
+    fill_pages(brief2_63, 'brief2', 'mother')
+##    skip('brief2')
+    
+##    ace10 = [[2, 2, 2, 2, 2],
+##             [2, 2, 2, 2, 2]]
+##    fill_pages(ace10, 'ace', 'father')
+    skip('ace')
 
-    fill_pages(ace10, 'ace', 'mother')
-
-#    skip_pcq()
+##    skip_pcq()
 
 
 if __name__ == '__main__':
