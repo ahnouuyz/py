@@ -9,7 +9,7 @@ pag.PAUSE = 0.05
 pag.FAILSAFE = True
 REDCOLOR = (195, 36, 50)
 REDPOS = (1, 80)
-TIMEOUT = 10
+TIMEOUT = 8
 
 def wait(delay=0.5):
     """ Need to find an event that is unique to completing a page load.
@@ -92,7 +92,7 @@ def skip(saq):
         wait()
         next_page()
 
-def fill_pages(pages, person=None):
+def fill_pages(pages, saq, person):
     """ sears
         pss
         srs
@@ -100,11 +100,14 @@ def fill_pages(pages, person=None):
         mspss
         ace
     """
-    for i, page in enumerate(pages):
-        fill_page(page)
-        if i == len(pages) - 1:
-            person_filling(person)
-        next_page()
+    if pages:
+        for i, page in enumerate(pages):
+            fill_page(page)
+            if i == len(pages) - 1:
+                person_filling(person)
+            next_page()
+    else:
+        skip(saq)
 
 def les(part1, part2, person=None):
     for i, (page1, page2) in enumerate(zip(part1, part2)):
@@ -117,24 +120,30 @@ def les(part1, part2, person=None):
         if any(x != 1 for x in page1):
             next_page()
             fill_page(page2)
-
-    for i in range(len(part1)):
-        activate_page()
-        for j in range(len(part1[i])):
-            select_option(part1[i][j])
-            pag.press('\t')
-            if (i == 1 and j == 5) or (i == 3 and j == 6):
-                pag.press('\t')
-        if any(x != 1 for x in part1[i]):
-            next_page()
-            fill_page(part2[i])
-        if i < 6:
-            next_page()
-    next_page()
+        next_page()
     wait()
     next_page()
     activate_page()
     person_filling(person)
+    next_page()
+
+#    for i in range(len(part1)):
+#        activate_page()
+#        for j in range(len(part1[i])):
+#            select_option(part1[i][j])
+#            pag.press('\t')
+#            if (i == 1 and j == 5) or (i == 3 and j == 6):
+#                pag.press('\t')
+#        if any(x != 1 for x in part1[i]):
+#            next_page()
+#            fill_page(part2[i])
+#        if i < 6:
+#            next_page()
+#    next_page()
+#    wait()
+#    next_page()
+#    activate_page()
+#    person_filling(person)
 
 def pcq():
     pass
@@ -207,27 +216,18 @@ def main():
     first_page(metadata, first_entry=True)
     skip('cbcl')
 
-    fill_pages(sears39, 'mother')
-#    skip('sears')
-
-    fill_pages(pss10, 'mother')
-#    skip('pss')
-
-    fill_pages(srs65, None)
-#    skip('srs')
-
-    fill_pages(bsi53, 'mother')
-
-    fill_pages(mspss12, 'mother')
+    fill_pages(sears39, 'sears', 'mother')
+    fill_pages(pss10, 'pss', 'mother')
+    fill_pages(srs65, 'srs', None)
+    fill_pages(bsi53, 'bsi', 'mother')
+    fill_pages(mspss12, 'mspss', 'mother')
 
     les(les47a, les47b, 'father')
-    next_page()
 #    skip_les()
 
-    skip_brief2()
+    skip('brief2')
 
-    fill_pages(ace10, 'mother')
-#    skip_ace()
+    fill_pages(ace10, 'ace', 'mother')
 
 #    skip_pcq()
 
