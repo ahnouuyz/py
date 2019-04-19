@@ -9,16 +9,15 @@ pag.PAUSE = 0.02
 pag.FAILSAFE = True
 REDCOLOR = (195, 36, 50)
 REDPOS = (1, 94)
-TIMEOUT = 60
 
-def wait(delay=0.5):
+def wait(delay=0.5, timeout=60):
     """ Need to find an event that is unique to completing a page load.
     """
     start_time = time.time()
     while pag.screenshot().getpixel(REDPOS) != REDCOLOR:
         elapsed_time = time.time() - start_time
-        if elapsed_time > TIMEOUT:
-            raise TimeoutError('Timeout on wait().')
+        if elapsed_time > timeout:
+            raise TimeoutError(f'Timeout. {elapsed_time:.2f} s have passed.')
     time.sleep(delay)
 
 def next_page():
@@ -60,6 +59,15 @@ def person_filling(person=None):
     else:
         raise ValueError('Unrecognized person filling in.')
 
+def person_option(person):
+    person_list = [None,
+                   'mother',
+                   'father',
+                   '',
+                   '',
+                   '',
+                   'maid']
+    return person_list.index(person)
 
 
 def skip(saq):
@@ -110,6 +118,83 @@ def test():
     skip_pcq_13()
 
 def main():
+    dct = {
+        'meta': [['010-21231', 'Roscoe', 1, '18/04/2019']],
+#        'cbcl': [[2, '', 1, 3, 2, 1, 2, 2, 2, '', 2, 2],
+#                 [2, 1, 1, 2, 1, 1, 2, 1, 2, 2],
+#                 [2, 2, 1, 1, 2, 1, 1, 2, '', 2, 1],
+#                 [2, 1, 3, 2, 2, 3, 2, 2, 2, '', 1],
+#                 [2, 2, 2, 3, 2, 'Peel nails', 3, 2, 2, 1, 2],
+#                 [1, 2, 2, 2, 1],
+#                 [2, 2, 2, 'Redness around eyes', 3, 3, 2, 2, '', 1],
+#                 [2, 'Peel skin around nails', 3, 1, 1],
+#                 [1, 2, 2, 2, 1, '', 1, 1, 1, 1, '', 1],
+#                 [2, 1, '', 1, 2, 2, 2, '', 1, 2, '', 1, 2],
+#                 [1, 1, '', 1, '', 1, '', 1, 2, 2, 2, 1, 2],
+#                 [1, '', 1, 2, 2, 2, 1, 1, 1, 1, '', 1],
+#                 [1, 1, 1, 2, '', 1, 1, 2, 2, 2, 1, 1, 2]],
+        'sears': [[],
+                  [4, 3, 3, 3, 3, 4, 2, 4, 4, 4, 2, 2, 2],
+                  [2, 3, 4, 4, 4, 4, 4, 4, 2, 2, 3, 2, 2],
+                  [2, 4, 1, 3, 3, 2, 2, 4, 3, 3, 3, 3, 3]],
+        'pss': [[4, 4, 4, 1, 2, 4, 2, 2, 4, 5]],
+        'srs': [[1, 1, 4, 2, 2, 1, 2, 1, 1, 1, 3],
+                [3, 1, 1, 3, 1, 3, 1, 2, 2, 2, 4],
+                [1, 2, 2, 4, 1, 2, 1, 2, 2, 3, 1],
+                [1, 1, 1, 1, 4, 2, 2, 1, 1, 2, 1],
+                [2, 1, 1, 3, 1, 1, 1, 2, 1, 1, 2],
+                [2, 1, 2, 1, 1, 1, 1, 1, 1, 1]],
+        'bsi': [[4, 1, 4, 4, 2, 4, 3, 3, 5, 5],
+                [5, 4, 5, 5, 2, 5, 5, 5, 5, 5],
+                [5, 5, 4, 2, 5, 3, 5, 5, 4, 4],
+                [5, 5, 4, 5, 5, 5, 5, 5, 5, 2],
+                [3, 3, 5, 5, 5, 4, 5, 4, 5, 5, 5, 5, 5]],
+        'mspss': [[3, 3, 3, 4, 3, 4],
+                  [4, 3, 4, 3, 3, 3]],
+        'les': [[3, 1, 1, 0],
+                [3, 1],
+                [1, 1, 1, 1, 1, 1, '', 0],
+                ['', 0],
+                [2, 2, 1, 1, 1, 1, 1, 1, 1],
+                [1, 4],
+                [1, 1, 1, 1, 1, 1, 1, '', 0],
+                ['', 0],
+                [1, 1, 1, 1, 2, 1, 1, 2, 2, 1],
+                [1, 1, 1],
+                [2, 0, 1, 2, 2, 0, 1, 1, 1, 1],
+                [1, 0, 1, 1, 0],
+                [1, 1, 1, 1, 1, 1, 1, 2, 0, 1, 1, 1],
+                [1, 0],
+                [],
+                []],
+#        'brief2': [[],
+#                   [2, 2, 2, 2, 3, 2, 2, 2, 2, 2],
+#                   [1, 2, 2, 2, 2, 2, 2, 1, 1, 2],
+#                   [3, 2, 2, 2, 2, 2, 1, 1, 2, 2],
+#                   [2, 2, 3, 2, 2, 1, 2, 2, 2, 2],
+#                   [2, 3, 2, 1, 2, 2, 2, 2, 2, 2],
+#                   [2, 2, 2, 1, 2, 2, 2, 2, 2, 1, 1, 1, 2]],
+        'ace': [[1, 1, 1, 1, 1],
+                [2, 1, 1, 2, 2]],
+#        'pcq': [[]]
+    }
+    saqs = ['meta', 
+            'cbcl', 
+            'sears', 
+            'pss', 
+            'srs', 
+            'bsi', 
+            'mspss', 
+            'les', 
+            'brief2', 
+            'ace', 
+            'pcq']
+    for saq in saqs:
+        try:
+            fill_pages(dct[saq], saq, '')
+        except KeyError:
+            skip(saq)
+
     metadata = [['010-21231', 'Roscoe', 1, '18/04/2019']]
     fill_pages(metadata, 'meta', None)
 
