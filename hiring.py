@@ -1,31 +1,37 @@
 
 def cost(candidates):
-    total_daily_rate = 0
-    for skill_list, daily_rate in candidates:
-        total_daily_rate += daily_rate
-    return total_daily_rate
+#    total_daily_rate = 0
+#    for skill_list, daily_rate in candidates:
+#        total_daily_rate += daily_rate
+#    return total_daily_rate
+    return sum(list(zip(*candidates))[1])
 
 def skills(candidates):
-    all_skills = set()
-    for skill_list, daily_rate in candidates:
-        all_skills |= set(skill_list)
-    return list(all_skills)
+#    all_skills = set()
+#    for skill_list, daily_rate in candidates:
+#        all_skills |= set(skill_list)
+#    return list(all_skills)
+    return list(set(s for skills, _ in candidates for s in skills))
 
 def uncovered(project, skills):
     return list(set(project) - set(skills))
 
 def best_individual_candidate(project, candidates):
-    best_rate = 0
-    for i, (skill_list, daily_rate) in enumerate(candidates):
-        relevant_skills = 0
-        for skill in skill_list:
-            if skill in project:
-                relevant_skills += 1
-        skills_per_dollar = relevant_skills / daily_rate
-        if best_rate < skills_per_dollar:
-            best_rate = skills_per_dollar
-            best_candidate = i
-    return best_candidate
+#    best_rate = 0
+#    for i, (skill_list, daily_rate) in enumerate(candidates):
+#        relevant_skills = 0
+#        for skill in skill_list:
+#            if skill in project:
+#                relevant_skills += 1
+#        skills_per_dollar = relevant_skills / daily_rate
+#        if best_rate < skills_per_dollar:
+#            best_rate = skills_per_dollar
+#            best_candidate = i
+#    return best_candidate
+    counts = [sum([sk in project for sk in sks]) for sks, _ in candidates]
+    rates = [rate for _, rate in candidates]
+    scores = [c / r for c, r in zip(counts, rates)]
+    return scores.index(max(scores))
 
 def team_of_best_individuals(project, candidates):
     maybe_best_team = []

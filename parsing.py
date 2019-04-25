@@ -1,19 +1,31 @@
 from math import pow
 
-def remove_whitespaces(string):
-    return ''.join(string.split())
-
 def tokenization(expr):
     operators_and_brackets = {'+', '-', '*', '/', '^', '(', ')'}
-    short_expr = remove_whitespaces(expr)
+    short_expr = ''.join(expr.split())
     tokens = []
-    for char in short_expr:
-        if char in operators_and_brackets:
-            tokens.append(
-    print(remove_whitespaces(expr))
+    print(list(short_expr))
+#    for i, char in enumerate(short_expr):
+#        if char in operators_and_brackets:
+#            short_expr = short_expr[i + 1 - len(tokens):]
+#            tokens.append(char)
+#            print(tokens)
+#            print(short_expr)
+#        else:
+#            continue
 
 def has_precedence(op1, op2):
-    raise NotImplementedError
+    precedences = {'+': 1,
+                   '-': 1,
+                   '*': 2,
+                   '/': 2,
+                   '^': 3,
+                   '(': 4,
+                   ')': 4}
+    if precedences[op1] > precedences[op2]:
+        return True
+    else:
+        return False
 
 def simple_evaluation(tokens):
     raise NotImplementedError
