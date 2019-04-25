@@ -34,17 +34,43 @@ def best_individual_candidate(project, candidates):
     return scores.index(max(scores))
 
 def team_of_best_individuals(project, candidates):
+    project_set = set(project)
+    candidates_copy = candidates[:]
     maybe_best_team = []
-    while project:
-        next_best = best_individual_candidate(project, candidates)
-        for skill in candidates[next_best][0]:
-            if skill in project:
-                project.remove(skill)
-        maybe_best_team.append(candidates.pop(next_best))
+    while project_set:
+        next_best = best_individual_candidate(list(project_set), candidates_copy)
+        project_set -= set(candidates_copy[next_best][0])
+        maybe_best_team.append(candidates_copy.pop(next_best))
     return maybe_best_team
 
+def must_haves(project, candidates):
+    print(candidates)
+    skillsets = [skills for skills, _ in candidates]
+    print(skillsets)
+    rare_skills = []
+    for skill in project:
+        count = 0
+        for skillset in skillsets:
+            if skill in skillset:
+                count += 1
+        if count == 1:
+            rare_skills.append(skill)
+    rare_candidates = []
+    for candidate in candidates:
+        for skill in rare_skills:
+            if skill in candidate[0]:
+                rare_candidates.append(candidate)
+                break
+    print(rare_skills)
+    print(rare_candidates)
+    return rare_candidates
+
 def best_team(project, candidates):
-    raise NotImplementedError
+    team = must_haves(project, candidates)
+    skills = [skill for skills, _ in team for skill in skills]
+    while set(project) - set(skills):
+        pass
+    print(team)
 
 # =======================================================================
 
