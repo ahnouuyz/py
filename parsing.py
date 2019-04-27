@@ -1,4 +1,5 @@
-from math import pow
+# Why do we need this?
+# from math import pow
 
 def tokenization(expr):
     symbols = {'+', '-', '*', '/', '^', '(', ')'}
@@ -10,12 +11,14 @@ def tokenization(expr):
             number += char
         elif char in symbols:
 #            print('Good token:', char)
-            if len(number) > 0:
+            if number:
                 tokens.append(float(number))
                 number = ''
             tokens.append(char)
         else:
             print('Unrecognized character:', char, '<-- has been ignored')
+    if number:
+        tokens.append(float(number))
     return tokens
 
 def has_precedence(op1, op2):
@@ -26,50 +29,86 @@ def has_precedence(op1, op2):
                    '^': 3,
                    '(': 4,
                    ')': 4}
-    if precedences[op1] > precedences[op2]:
+    if precedences[op1] >= precedences[op2]:
         return True
     else:
         return False
 
 def operate(number1, operator, number2):
     if operator == '+':
-        return number1 + number2
+        result =  number1 + number2
     elif operator == '-':
-        return number1 - number2
+        result =  number1 - number2
     elif operator == '*':
-        return number1 * number2
+        result =  number1 * number2
     elif operator == '/':
-        return number1 / number2
+        result =  number1 / number2
     elif operator == '^':
-        return pow(number1, number2)
+        result =  number1 ** number2
     else:
         print('Unknown operator:', operator)
+    return float(result)
 
 def simple_evaluation(tokens):
-    # Find the operator with the highest precedence.
-    for i in range(1, len(tokens) - 3, 2):
-        current_token = tokens[i]
-        next_token = tokens[i + 2]
-        print(current_token, next_token)
-        print(has_precedence(current_token, next_token))
-        if has_precedence(current_token, next_token):
-            print('We will evaluate here')
-            print(tokens[i - 1:i + 2])
-            print(operate(tokens[i - 1], tokens[i], tokens[i + 1]))
-#    operators = tokens[1::2]
-#    print(tokens)
-#    print(operators)
+    tokens2 = tokens[:]
+    while len(tokens2) > 3:
+        for i in range(1, len(tokens2) - 3, 2):
+            current_token = tokens2[i]
+            next_token = tokens2[i + 2]
+            print(current_token, next_token)
+            print(has_precedence(current_token, next_token))
+            if has_precedence(current_token, next_token):
+                res = operate(tokens2[i - 1], tokens2[i], tokens2[i + 1])
+                print('We will evaluate here')
+                print(tokens2[i - 1:i + 2])
+                print(res)
+                tokens2.pop(i + 1)
+                tokens2.pop(i)
+                tokens2.pop(i - 1)
+                tokens2.insert(i - 1, res)
+                print(tokens2)
+                break
+            elif i == len(tokens2) - 4:
+                i += 2
+                res = operate(tokens2[i - 1], tokens2[i], tokens2[i + 1])
+                tokens2.pop(i + 1)
+                tokens2.pop(i)
+                tokens2.pop(i - 1)
+                tokens2.insert(i - 1, res)
+                break
+    return operate(tokens2[0], tokens2[1], tokens2[2])
 
 def complex_evaluation(tokens):
-    raise NotImplementedError
+    tokens2 = tokens[:]
+    while '(' in tokens2 and ')' in tokens2:
+        tokens3 = []
+        for i, token in enumerate(tokens2):
+            if token == '(':
+                start = i
+            elif token == ')':
+                end = i
+                break
+        print(start, end)
+        for i in range(start + 1, end):
+            tokens3.append(tokens2[i])
+        print(tokens3)
+        print(tokens2)
+        for i in range(end, start - 1, -1):
+            print(i)
+            tokens2.pop(i)
+        print(tokens2)
+        tokens2.insert(start, simple_evaluation(tokens3))
+        print(tokens2)
+    return simple_evaluation(tokens2)
 
 def evaluation(string):
-    raise NotImplementedError
+    return complex_evaluation(tokenization(string))
 
 # =======================================================================
 
 def main():
-    examples = ['print(tokenization("(3.1 + 6*2^2) * (2 - 1)"))',
+    examples = ['print(tokenization("1+1"))',
+                'print(tokenization("(3.1 + 6*2^2) * (2 - 1)"))',
                 'print(has_precedence("*", "+"))',
                 'print(has_precedence("^", "+"))',
                 'print(has_precedence("*", "^"))',

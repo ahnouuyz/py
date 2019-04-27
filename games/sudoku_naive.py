@@ -87,7 +87,7 @@ def naive_solve(nl, blank_char=r'0'):
     else:
         print('Completed.')
 
-if __name__ == '__main__':
+def main():
     if len(sys.argv) > 1:
         with open(sys.argv[1]) as f:
             nll = [l.strip() for l in f]
@@ -98,3 +98,5 @@ if __name__ == '__main__':
 #        nl = '0043002010020010'
         naive_solve(nl, blank_char=r' ')
 
+if __name__ == '__main__':
+    main()

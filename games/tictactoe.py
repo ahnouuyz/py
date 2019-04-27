@@ -6,6 +6,12 @@ class Tictactoe:
 		self.positions = set((r, c) for r in range(3) for c in range(3))
 
 	def __repr__(self):
+		return self.print_board()
+
+	def __str__(self):
+		return self.print_board()
+
+	def print_board(self):
 		sll = [[' XO'[val] for val in row] for row in self.state]
 		hline = '  ---|---|---'
 		render = '   1   2   3 \n'
@@ -15,15 +21,12 @@ class Tictactoe:
 			render += line + '\n' + hline + '\n' if i < 2 else line + '\n'
 		return render
 
-	def __str__(self):
-		return self.__repr__()
-
 	def show_positions(self):
 		lst = ['abc'[c] + '123'[r] for r, c in self.positions]
 		return ' '.join(sorted(lst))
 
 	def input_position(self):
-		print(self.__repr__())
+		print(self.print_board())
 		print(f'Available positions: {self.show_positions()}')
 		usr_input = input('("q" to quit) Input a "a1"-"c3" or "row,col": ')
 		if usr_input[0].lower() == 'q':
@@ -82,7 +85,7 @@ class Tictactoe:
 			else:
 				print('\nInvalid move! Please try again...')
 
-		print(self.__repr__())
+		print(self.print_board())
 		if pos == 'quit':
 			print('Game terminated.')
 		elif winner:
@@ -129,7 +132,7 @@ class Tictactoe:
 				return pos
 			else:
 				return rd.sample(self.positions, 1)[0]
-		
+
 	def run_1_player(self):
 		while len(self.positions) > 0:
 			move = 10 - len(self.positions)
@@ -153,7 +156,7 @@ class Tictactoe:
 			else:
 				print('\nInvalid move! Please try again...')
 
-		print(self.__repr__())
+		print(self.print_board())
 		if pos == 'quit':
 			print('Game terminated.')
 		elif winner:
@@ -161,7 +164,7 @@ class Tictactoe:
 		else:
 			print('Game over! It\'s a draw!')
 
-if __name__ == '__main__':
+def main():
 	game = Tictactoe()
 	print('Select mode: \n1:  1-player\n2:  2-players')
 	mode = int(input('Mode: ')[0])
@@ -172,3 +175,5 @@ if __name__ == '__main__':
 	else:
 		print('Exiting...')
 
+if __name__ == '__main__':
+	main()
