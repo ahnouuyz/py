@@ -44,9 +44,7 @@ def team_of_best_individuals(project, candidates):
     return maybe_best_team
 
 def must_haves(project, candidates):
-    print(candidates)
     skillsets = [skills for skills, _ in candidates]
-    print(skillsets)
     rare_skills = []
     for skill in project:
         count = 0
@@ -61,16 +59,24 @@ def must_haves(project, candidates):
             if skill in candidate[0]:
                 rare_candidates.append(candidate)
                 break
-    print(rare_skills)
-    print(rare_candidates)
+#    print(rare_skills)
+#    print(rare_candidates)
     return rare_candidates
 
 def best_team(project, candidates):
     team = must_haves(project, candidates)
     skills = [skill for skills, _ in team for skill in skills]
-    while set(project) - set(skills):
+    skills_needed = uncovered(project, skills)
+    candidates_left = []
+    for candidate in candidates:
+        if candidate not in team:
+            candidates_left.append(candidate)
+    print('Skills available:', set(skills))
+    print('Skills still needed:', skills_needed)
+    print('Candidates left:', candidates_left)
+    while skills_needed:
         pass
-    print(team)
+    return team
 
 # =======================================================================
 
