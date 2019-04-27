@@ -1,18 +1,25 @@
 from math import pow
 
 def tokenization(expr):
-    operators_and_brackets = {'+', '-', '*', '/', '^', '(', ')'}
-    short_expr = ''.join(expr.split())
+    symbols = {'+', '-', '*', '/', '^', '(', ')'}
     tokens = []
-    print(list(short_expr))
-#    for i, char in enumerate(short_expr):
-#        if char in operators_and_brackets:
-#            short_expr = short_expr[i + 1 - len(tokens):]
-#            tokens.append(char)
-#            print(tokens)
-#            print(short_expr)
-#        else:
-#            continue
+    number = ''
+    for char in expr:
+        if char == ' ':
+#            print('Discarding a space')
+            continue
+        elif char.isnumeric() or char == '.':
+#            print('Part of a number:', char)
+            number += char
+        elif char in symbols:
+#            print('Good token:', char)
+            if len(number) > 0:
+                tokens.append(float(number))
+                number = ''
+            tokens.append(char)
+        else:
+            raise ValueError('Unrecognized character:', char)
+    return tokens
 
 def has_precedence(op1, op2):
     precedences = {'+': 1,
@@ -28,6 +35,14 @@ def has_precedence(op1, op2):
         return False
 
 def simple_evaluation(tokens):
+    # Find the operator with the highest precedence.
+    for i in range(1, len(tokens) - 3, 2):
+        current_token = tokens[i]
+        next_token = tokens[i + 2]
+        print(current_token, next_token)
+#    operators = tokens[1::2]
+#    print(tokens)
+#    print(operators)
     raise NotImplementedError
 
 def complex_evaluation(tokens):
