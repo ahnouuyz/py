@@ -3,9 +3,10 @@
 
 def tokenization(expr):
     symbols = {'+', '-', '*', '/', '^', '(', ')'}
+    trim = ''.join(expr.split())
     tokens = []
     number = ''
-    for char in expr:
+    for char in trim:
         if char.isnumeric() or char == '.':
 #            print('Part of a number:', char)
             number += char
@@ -29,25 +30,36 @@ def has_precedence(op1, op2):
                    '^': 3,
                    '(': 4,
                    ')': 4}
-    if precedences[op1] >= precedences[op2]:
-        return True
-    else:
-        return False
+    return precedences[op1] >= precedences[op2]
 
-def operate(number1, operator, number2):
-    if operator == '+':
-        result =  number1 + number2
-    elif operator == '-':
-        result =  number1 - number2
-    elif operator == '*':
-        result =  number1 * number2
-    elif operator == '/':
-        result =  number1 / number2
-    elif operator == '^':
-        result =  number1 ** number2
-    else:
-        print('Unknown operator:', operator)
-    return float(result)
+def operate(num1, operator, num2):
+#    if operator == '+':
+#        result =  num1 + num2
+#    elif operator == '-':
+#        result =  num1 - num2
+#    elif operator == '*':
+#        result =  num1 * num2
+#    elif operator == '/':
+#        result =  num1 / num2
+#    elif operator == '^':
+#        result =  num1 ** num2
+#    else:
+#        print('Unknown operator:', operator)
+#    return float(result)
+    num1 = float(num1)
+    num2 = float(num2)
+    operators = {'+': float.__add__,
+                 '-': float.__sub__,
+                 '*': float.__mul__,
+                 '/': float.__truediv__,
+                 '^': float.__pow__}
+    return operators[operator](num1, num2)
+
+def replace_triple(lst, start):
+    new_value = operate(*lst[start:start + 3])
+    for _ in range(3):
+        lst.pop(start)
+    lst.insert(start, new_value)
 
 def simple_evaluation(tokens):
     tokens2 = tokens[:]
@@ -55,26 +67,13 @@ def simple_evaluation(tokens):
         for i in range(1, len(tokens2) - 3, 2):
             current_token = tokens2[i]
             next_token = tokens2[i + 2]
-            print(current_token, next_token)
-            print(has_precedence(current_token, next_token))
+#            print(current_token, next_token)
             if has_precedence(current_token, next_token):
-                res = operate(tokens2[i - 1], tokens2[i], tokens2[i + 1])
-                print('We will evaluate here')
-                print(tokens2[i - 1:i + 2])
-                print(res)
-                tokens2.pop(i + 1)
-                tokens2.pop(i)
-                tokens2.pop(i - 1)
-                tokens2.insert(i - 1, res)
-                print(tokens2)
+                replace_triple(tokens2, i - 1)
                 break
             elif i == len(tokens2) - 4:
                 i += 2
-                res = operate(tokens2[i - 1], tokens2[i], tokens2[i + 1])
-                tokens2.pop(i + 1)
-                tokens2.pop(i)
-                tokens2.pop(i - 1)
-                tokens2.insert(i - 1, res)
+                replace_triple(tokens2, i - 1)
                 break
     return operate(tokens2[0], tokens2[1], tokens2[2])
 
@@ -82,21 +81,12 @@ def complex_evaluation(tokens):
     tokens2 = tokens[:]
     while '(' in tokens2 and ')' in tokens2:
         tokens3 = []
-        for i, token in enumerate(tokens2):
-            if token == '(':
-                start = i
-            elif token == ')':
-                end = i
-                break
-        print(start, end)
-        for i in range(start + 1, end):
-            tokens3.append(tokens2[i])
-        print(tokens3)
+        start = tokens2.index('(')
+        end = tokens2.index(')')
+        tokens3 = tokens2[start + 1:end]
         print(tokens2)
         for i in range(end, start - 1, -1):
-            print(i)
             tokens2.pop(i)
-        print(tokens2)
         tokens2.insert(start, simple_evaluation(tokens3))
         print(tokens2)
     return simple_evaluation(tokens2)
@@ -107,6 +97,9 @@ def evaluation(string):
 # =======================================================================
 
 def main():
+#    examples = ['print(tokenization("1+1"))',
+#                'print(tokenization("(3.1 + 6*2^2) * (2 - 1)"))']
+
     examples = ['print(tokenization("1+1"))',
                 'print(tokenization("(3.1 + 6*2^2) * (2 - 1)"))',
                 'print(has_precedence("*", "+"))',
