@@ -7,11 +7,9 @@ def tokenization(expr):
     tokens = []
     number = ''
     for char in trim:
-        if char.isnumeric() or char == '.':
-#            print('Part of a number:', char)
+        if char in '.0123456789':
             number += char
         elif char in symbols:
-#            print('Good token:', char)
             if number:
                 tokens.append(float(number))
                 number = ''
@@ -33,19 +31,6 @@ def has_precedence(op1, op2):
     return precedences[op1] >= precedences[op2]
 
 def operate(num1, operator, num2):
-#    if operator == '+':
-#        result =  num1 + num2
-#    elif operator == '-':
-#        result =  num1 - num2
-#    elif operator == '*':
-#        result =  num1 * num2
-#    elif operator == '/':
-#        result =  num1 / num2
-#    elif operator == '^':
-#        result =  num1 ** num2
-#    else:
-#        print('Unknown operator:', operator)
-#    return float(result)
     num1 = float(num1)
     num2 = float(num2)
     operators = {'+': float.__add__,
