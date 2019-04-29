@@ -2,14 +2,13 @@
 # from math import pow
 
 def tokenization(expr):
-    symbols = {'+', '-', '*', '/', '^', '(', ')'}
     trim = ''.join(expr.split())
     tokens = []
     number = ''
     for char in trim:
         if char in '.0123456789':
             number += char
-        elif char in symbols:
+        elif char in '+-*/^()':
             if number:
                 tokens.append(float(number))
                 number = ''
@@ -82,9 +81,6 @@ def evaluation(string):
 # =======================================================================
 
 def main():
-#    examples = ['print(tokenization("1+1"))',
-#                'print(tokenization("(3.1 + 6*2^2) * (2 - 1)"))']
-
     examples = ['print(tokenization("1+1"))',
                 'print(tokenization("(3.1 + 6*2^2) * (2 - 1)"))',
                 'print(has_precedence("*", "+"))',
@@ -102,4 +98,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
