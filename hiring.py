@@ -1,5 +1,6 @@
 def cost(candidates):
-    return sum(list(zip(*candidates))[1])
+    return sum(c for s, c in candidates)
+#    return sum(tuple(zip(*candidates))[1])
 
 def skills(candidates):
     return list(set(s for skills, _ in candidates for s in skills))
@@ -8,9 +9,10 @@ def uncovered(project, skills):
     return list(set(project) - set(skills))
 
 def best_individual_candidate(project, candidates):
-    counts = [sum([sk in project for sk in sks]) for sks, _ in candidates]
-    rates = [rate for _, rate in candidates]
-    scores = [c / r for c, r in zip(counts, rates)]
+#    counts = [sum([sk in project for sk in sks]) for sks, _ in candidates]
+#    rates = [rate for _, rate in candidates]
+#    scores = [c / r for c, r in zip(counts, rates)]
+    scores = [sum([sk in project for sk in sks]) / c for sks, c in candidates]
     return scores.index(max(scores))
 
 def team_of_best_individuals(project, candidates):
