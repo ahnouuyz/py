@@ -159,6 +159,7 @@ def tests():
                 'print(A.T.T)', 
                 'print(A.T @ A)', 
                 'print(A / 2)', 
+                'print(B)', 
                 'print(A.T @ B)', 
                 'print(B.T @ A)', 
                 'print(B.T @ B)', 
