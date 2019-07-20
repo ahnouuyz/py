@@ -38,10 +38,11 @@ class NeuralNet:
     
     def bprop(self, activation):
         error = self.output - self.y
-        dW = self.X.T @ (error * activators[activation][1](self.output))
-        db = (error * activators[activation][1](self.output)).sum()
-        self.W += -dW
-        self.b += -db
+        neg_grad = -activators[activation][1](self.output)
+        dW = self.X.T @ (error * neg_grad)
+        db = (error * neg_grad).sum()
+        self.W += dW
+        self.b += db
 
     def train(self, iterations, activation):
         for i in tqdm(range(iterations)):
