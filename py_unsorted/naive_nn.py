@@ -1,11 +1,17 @@
 import numpy as np
 from tqdm import tqdm
 
-X_train = 'data/x_train.csv'
-y_train = 'data/y_train.csv'
+# X_train = 'data/x_train.csv'
+# y_train = 'data/y_train.csv'
+# 
+# X = np.loadtxt(X_train, delimiter=',')
+# y = np.loadtxt(y_train, dtype='B')[:, np.newaxis]
 
-X = np.loadtxt(X_train, delimiter=',')
-y = np.loadtxt(y_train, dtype='B')[:, np.newaxis]
+X = np.random.rand(100, 2)
+y = np.random.randint(0, 2, (100, 1))
+
+print(X[:5])
+print(y[:5])
 
 def sigmoid(x):
         return 1.0 / (1.0 + np.exp(-x))
@@ -55,5 +61,6 @@ if __name__ == '__main__':
     
     print(nn.W)
     print(nn.b)
+    print(nn.output[:5])
     print()
     print(((nn.output - y) ** 2).sum())
