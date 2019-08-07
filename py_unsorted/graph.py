@@ -1,10 +1,11 @@
 def all_paths(M, u, v):
-    """ Returns a list of all paths from u to v in M. """
+    'Return a list of all paths from u to v in M'
     current_row = M[u]
     print(current_row)
 
     ll = []
     for i, val in enumerate(current_row):
+        lst = []
         if i == v:
             lst.append(i)
             return lst

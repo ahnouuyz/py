@@ -52,24 +52,24 @@ def simple_evaluation(tokens):
 
 def complex_evaluation(tokens):
     lst = tokens[:]
-#     while '(' in lst and ')' in lst:
-#         for i, x in enumerate(lst):
-#             if x == '(':
-#                 start = i
-#             if x == ')':
-#                 end = i
-#                 break
-#         replacement = simple_evaluation(lst[start + 1:end])
-#         lst = lst[:start] + [replacement] + lst[end + 1:]
-#         print(lst)
-
-    breakpoint() 
     while '(' in lst and ')' in lst:
-       start = lst.index('(')
-       end = lst.index(')') + 1
-       replacement = simple_evaluation(lst[start + 1:end - 1])
-       lst = lst[:start] + [replacement] + lst[end:]
-       print(lst)
+        for i, x in enumerate(lst):
+            if x == '(':
+                start = i
+            if x == ')':
+                end = i
+                break
+        replacement = simple_evaluation(lst[start + 1:end])
+        lst = lst[:start] + [replacement] + lst[end + 1:]
+        print(lst)
+
+#    breakpoint() 
+#    while '(' in lst and ')' in lst:
+#       start = lst.index('(')
+#       end = lst.index(')') + 1
+#       replacement = simple_evaluation(lst[start + 1:end - 1])
+#       lst = lst[:start] + [replacement] + lst[end:]
+#       print(lst)
 
     return simple_evaluation(lst)
 
@@ -95,6 +95,6 @@ def main():
         print()
 
 if __name__ == '__main__':
-#     main()
-    import sys
-    print(evaluation(sys.argv[1]))
+     main()
+#    import sys
+#    print(evaluation(sys.argv[1]))
