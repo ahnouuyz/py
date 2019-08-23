@@ -1,6 +1,6 @@
+#!/usr/bin/env python3
+
 def factorize(n):
-    """ Returns the factors of a given number.
-    """
     if n < 1:
         return 'Only accept positive integers.'
     dct = {}
@@ -17,12 +17,14 @@ def factorize(n):
     return dct
 
 def tests():
-    examples = ['print(factorize(0))', 
-                'print(factorize(1))', 
-                'print(factorize(2))', 
-                'print(factorize(60))', 
-                'print(factorize(123456))', 
-                'print(factorize(21634987))']
+    examples = [
+        'print(factorize(0))', 
+        'print(factorize(1))', 
+        'print(factorize(2))', 
+        'print(factorize(60))', 
+        'print(factorize(123456))', 
+        'print(factorize(21634987))'
+    ]
     for example in examples:
         print(example)
         eval(example)

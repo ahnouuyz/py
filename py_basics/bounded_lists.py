@@ -1,4 +1,4 @@
-from pprint import pprint
+#!/usr/bin/env python3
 
 def bounded_lists(upper_bounds):
     rngs = (range(n + 1) for n in upper_bounds)
@@ -9,7 +9,8 @@ def bounded_lists(upper_bounds):
 
 def main():
     ll = bounded_lists([2, 1, 2])
-    pprint(ll)
+    for lst in ll:
+        print(lst)
 
 if __name__ == '__main__':
     main()

@@ -1,17 +1,7 @@
+#!/usr/bin/env python3
+
 import numpy as np
 from tqdm import tqdm
-
-# X_train = 'data/x_train.csv'
-# y_train = 'data/y_train.csv'
-# 
-# X = np.loadtxt(X_train, delimiter=',')
-# y = np.loadtxt(y_train, dtype='B')[:, np.newaxis]
-
-X = np.random.rand(100, 2)
-y = np.random.randint(0, 2, (100, 1))
-
-print(X[:5])
-print(y[:5])
 
 def sigmoid(x):
         return 1.0 / (1.0 + np.exp(-x))
@@ -56,6 +46,9 @@ class NeuralNet:
             self.bprop(activation=activation)
 
 if __name__ == '__main__':
+    X = np.random.rand(100, 2)
+    y = np.random.randint(0, 2, (100, 1))
+
     nn = NeuralNet(X, y, random_seed=1)
     nn.train(1000, activation='sigmoid')
     
@@ -63,4 +56,4 @@ if __name__ == '__main__':
     print(nn.b)
     print(nn.output[:5])
     print()
-    print(((nn.output - y) ** 2).sum())
+    print(((nn.output - y) ** 2).round().sum())
