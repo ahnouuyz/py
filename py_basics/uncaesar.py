@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import string
 
 def main():
@@ -31,3 +33,4 @@ def try26(text):
 
 if __name__ == '__main__':
     main()
+    print(try26('kzbkz'))
