@@ -1,16 +1,24 @@
+// copycat.c
+
 #include <stdio.h>
 
-#define BUFFERSIZE 100
+void printfile(const char *filename) {
+    int c;
+    FILE *file = fopen(filename, "r");
+    if (file) {
+        while ((c = fgetc(file)) != EOF)
+            putchar(c);
+        fclose(file);
+    }
+}
 
-int main(int argc, const char *argv[]) {
-	char buffer[BUFFERSIZE];
-	FILE *fp = fopen(argv[1], "r");
-
-	while (fgets(buffer, sizeof(buffer), fp) != NULL) {
-		fprintf(stderr, "%s", buffer);
-	}
-
-	(void)fclose(fp);
-
-	return 0;
+int main(const int argc, const char **argv) {
+    int c;
+    if (argc > 1)
+        for (int i = 1; i < argc; i++)
+            printfile(argv[i]);
+    else
+        while ((c = getchar()) != EOF)
+            putchar(c);
+    return 0;
 }
